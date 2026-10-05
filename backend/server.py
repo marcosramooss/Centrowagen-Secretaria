@@ -23,6 +23,10 @@ from routers.client_messages import router as client_messages_router
 from routers.sales import router as sales_router
 from routers.audit import router as audit_router
 from routers.stats import router as stats_router
+from routers.tasks import router as tasks_router
+from routers.tariff import router as tariff_router
+from routers.offers import router as offers_router
+from routers.ai import router as ai_router
 
 
 # Startup runs before the yield, shutdown after it. Add your own setup/teardown here.
@@ -54,7 +58,7 @@ async def root():
     return {"app": "SecretarIA", "message": "Asistente comercial Volkswagen — Centrowagen Don Benito", "demo": True}
 
 
-for _router in (auth_router, dealer_router, knowledge_router, chat_router, client_message_router, client_messages_router, sales_router, audit_router, stats_router):
+for _router in (auth_router, dealer_router, knowledge_router, chat_router, client_message_router, client_messages_router, sales_router, audit_router, stats_router, tasks_router, tariff_router, offers_router, ai_router):
     api_router.include_router(_router)
 
 # Include the router in the main app — keep this the last routing statement

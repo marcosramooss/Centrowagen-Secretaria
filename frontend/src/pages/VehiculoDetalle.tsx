@@ -1,9 +1,11 @@
+import { useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, FileDown } from "lucide-react";
 
 import { AvailabilityBadge, DemoPill, PromoBadge, StaleWarning } from "@/components/bits";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { apiGet } from "@/lib/api";
 import { eur, eur2, fmtDate } from "@/lib/format";
@@ -20,6 +22,7 @@ function Row({ label, value }: { label: string; value: React.ReactNode }) {
 
 export default function VehiculoDetalle() {
   const { id } = useParams<{ id: string }>();
+  const [offerClient, setOfferClient] = useState("");
   const { data, isError, isPending } = useQuery({
     queryKey: ["vehicle", id],
     queryFn: () => apiGet<VehicleDetail>(`/vehicles/${id}`),
@@ -105,9 +108,33 @@ export default function VehiculoDetalle() {
                       ✉️ Crear respuesta para cliente
                     </Button>
                   </Link>
+                  <a
+                    href={`/api/offers/${v.id}/pdf?client_name=${encodeURIComponent(offerClient)}${
+                      data?.stock[0]?.stock_number ? `&stock_number=${encodeURIComponent(data.stock[0].stock_number)}` : ""
+                    }`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <Button variant="outline" className="gap-2" data-testid="vehicle-offer-pdf-button">
+                      <FileDown className="h-4 w-4" /> Oferta en PDF
+                    </Button>
+                  </a>
                   <Link to="/comparador">
                     <Button variant="outline" data-testid="vehicle-compare-button">📊 Comparar</Button>
                   </Link>
+                </div>
+
+                <div className="mt-3 flex flex-wrap items-center gap-2">
+                  <Input
+                    value={offerClient}
+                    onChange={(e) => setOfferClient(e.target.value)}
+                    placeholder="Nombre del cliente para la oferta PDF"
+                    className="h-9 max-w-xs text-sm"
+                    data-testid="vehicle-offer-client-input"
+                  />
+                  <span className="text-[11px] text-muted-foreground">
+                    Se imprime con tu nombre, la fecha y el aviso de condiciones.
+                  </span>
                 </div>
               </div>
             </div>

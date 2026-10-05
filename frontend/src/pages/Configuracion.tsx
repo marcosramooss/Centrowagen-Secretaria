@@ -266,10 +266,13 @@ export default function Configuracion() {
           <div className="glass-panel rounded-2xl p-5" data-testid="config-integraciones">
             <h3 className="mb-4 text-base font-semibold text-white">Integraciones activas</h3>
             <div className="space-y-2">
-              <Integration name="Claude (Anthropic)" detail="Motor del asistente SecretarIA — claude-sonnet-5-5 con RAG sobre la base de datos" ok />
-              <Integration name="Resend (email gestionado)" detail="Envío de mensajes a clientes por correo desde el generador de respuestas" ok />
+              <Integration name="Claude (Anthropic)" detail="Motor del asistente — claude-sonnet-5-5 y Opus 5.5, con RAG sobre la base de datos" ok />
+              <Integration name="ChatGPT (OpenAI)" detail="Motor alternativo seleccionable en el asistente — GPT-5.6 y GPT-5.4 mini" ok />
+              <Integration name="Resend (email gestionado)" detail="Mensajes a clientes y resumen diario de tareas a las 08:00" ok />
               <Integration name="Google Sign-In (Emergent)" detail="Acceso con cuenta de Google — los nuevos accesos entran con perfil VENDEDOR" ok />
               <Integration name="Almacenamiento de archivos y medios" detail="Documentos y archivos guardados en almacenamiento duradero (sobrevive a los despliegues)" ok />
+              <Integration name="Importación de tarifas Excel/CSV" detail="Sube la tarifa oficial y actualiza precios y stock con confirmación previa" ok />
+              <Integration name="Lectura de PDF para el RAG" detail="El texto de catálogos y circulares en PDF se indexa para poder citarlo" ok />
               <Integration name="Sincronización de stock VW" detail="Pendiente de conectar con la fuente oficial del concesionario" />
               <Integration name="Tarifas oficiales automáticas" detail="Pendiente de conectar con Volkswagen España" />
             </div>

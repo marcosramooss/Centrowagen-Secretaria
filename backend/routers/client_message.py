@@ -35,7 +35,9 @@ async def client_message(payload: ClientMessageIn, user: dict = Depends(get_curr
     )
 
     async def gen():
-        async for delta in stream_completion(system, instruction, session_id=f"clientmsg-{new_id()}"):
+        async for delta in stream_completion(
+            system, instruction, session_id=f"clientmsg-{new_id()}", model_key=payload.engine
+        ):
             yield _sse({"type": "delta", "content": delta})
         yield _sse({"type": "done"})
 

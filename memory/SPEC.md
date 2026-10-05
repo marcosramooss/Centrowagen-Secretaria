@@ -19,15 +19,18 @@ Todo el contenido actual está marcado **DATOS DE DEMOSTRACIÓN**.
 ## Integraciones
 | Integración | Dónde | Notas |
 |---|---|---|
-| **Claude (Anthropic)** | `lib/llm.py` → `claude-sonnet-5-5` vía `emergentintegrations`, clave `EMERGENT_LLM_KEY` | streaming SSE en `POST /api/chat` y `POST /api/client-message` |
-| **Resend gestionado** | `lib/email.py` + `routers/client_messages.py` | `EMERGENT_EMAIL_KEY`, `EMAIL_FROM_NAME`; gate `_assert_safe_email` en cada envío; la ruta de envío recibe solo un **id** (G4), plantilla y destinatario son de servidor; límite 10 envíos/hora/usuario |
-| **Google Sign-In (Emergent)** | `POST /api/auth/google` + `src/components/AuthCallback.tsx` | el `session_id` del fragmento se canjea en backend; crea/reutiliza usuario por email con rol `vendedor` |
-| **Almacenamiento de archivos** | `lib/storage.py` + `routers/knowledge.py` | objetos en `secretaria-centrowagen/documents/...`; borrado **lógico** (`is_deleted`), sin API de delete; descarga siempre por backend |
+| **Claude (Anthropic)** | `lib/llm.py` → `claude-sonnet-5-5` / `claude-opus-5-5` | motor por defecto |
+| **ChatGPT (OpenAI)** | `lib/llm.py` → `gpt-5.6-terra` / `gpt-5.4-mini` | seleccionable en el asistente; `GET /api/ai/models` lista los motores, el cliente envía `model` en `/api/chat` y `engine` en `/api/client-message`; la preferencia se guarda en localStorage |
+| **Resend gestionado** | `lib/email.py`, `routers/client_messages.py`, `routers/tasks.py` | mensajes a cliente + **resumen diario de tareas**; gate `_assert_safe_email` en cada envío; la ruta de envío recibe solo un **id** (G4) |
+| **Google Sign-In (Emergent)** | `POST /api/auth/google` + `AuthCallback.tsx` | el `session_id` se canjea en backend; email nuevo → rol `vendedor` |
+| **Almacenamiento de archivos** | `lib/storage.py` + `routers/knowledge.py` | borrado **lógico** (`is_deleted`); descarga siempre por backend |
+| **Cron de plataforma** | `.emergent/crons.yml` → `POST /api/cron/daily-digest` | 08:00 Europe/Madrid; bearer `WEBHOOK_CRON_SECRET`, ack 2xx inmediato + trabajo en `BackgroundTasks`, idempotente por `X-Webhook-Id` en `cron_runs` |
 
 ## Modelo de datos (colecciones Mongo)
 `users`, `sessions`, `google_sessions`, `vehicles`, `stock`, `prices`, `financing`, `promotions`,
-`documents`, `faq`, `memory`, `argumentario`, `chats`, `messages`, `client_messages`, `sales`, `settings`.
-Ids string uuid4. Cada modelo Pydantic tiene su interfaz TS espejo en `src/lib/types.ts`.
+`documents`, `faq`, `memory`, `argumentario`, `chats`, `messages`, `client_messages`, `sales`, `settings`,
+`tasks` (recordatorios), `cron_runs` (idempotencia del cron).
+Ids string uuid4. Cada modelo Pydantic tiene su interfaz TS espejo en `src/lib/types.ts` (fase 1) o `src/lib/types2.ts` (fase 2).
 
 ## Datos sembrados (`python seed.py --force`)
 - **17 versiones** de 10 modelos: Golf (Life/R-Line/GTI), T-Roc (Life/R-Line), Tiguan (Life/R-Line),
@@ -49,7 +52,18 @@ Ids string uuid4. Cada modelo Pydantic tiene su interfaz TS espejo en `src/lib/t
    (streaming) → copiar o **enviar por email** (Resend gestionado). Deep link desde la ficha: `/cliente?model=...`.
    Si falta un dato comercial, el mensaje escribe `[DATO PENDIENTE DE CONFIRMACIÓN]`.
 8. **Ventas** (`/ventas`): registra operación → comisión estimada = (PVP − descuento) × tasa; KPIs mes/año + objetivo.
-9. **Modo vendedor / cliente**: `ModeContext` (localStorage) → se envía al backend y cambia el prompt.
+9. **Recordatorios** (`/tareas`): CRUD de seguimientos con tipo, cliente, teléfono, vehículo, fecha/hora y prioridad.
+   Estados derivados de la fecha: vencida / hoy / próximos 7 días. Avisos in-app: campana en la cabecera
+   (`notifications-bell-button`, badge con vencidas+hoy), contador en el menú y bloque en el dashboard.
+   Email automático cada día a las 08:00 (cron de plataforma) solo si hay vencidas o de hoy.
+10. **Importar tarifa** (`/importar`, solo ADMIN): sube Excel/CSV → `POST /api/tariff/preview` (**no escribe nada**)
+    empareja por modelo+acabado y clasifica cada fila en `actualizable` / `nueva` / `no_reconocida` con el delta de
+    precio → el usuario confirma → `POST /api/tariff/apply` actualiza `prices` y, si se marca, el PVP de `stock`.
+    Cabecera detectada en cualquiera de las 10 primeras filas; importes en formato español (35.020,50).
+11. **Oferta PDF** (`GET /api/offers/{vehicle_id}/pdf?client_name=&stock_number=`): reportlab, con cliente, vendedor,
+    fecha, ficha, precio, promociones vigentes, financiación, equipamiento y aviso legal. Botón en la ficha del vehículo.
+12. **Modo vendedor / cliente**: `ModeContext` (localStorage) → se envía al backend y cambia el prompt.
+13. **RAG de PDF**: `_extract_text` en `routers/knowledge.py` indexa TXT/CSV/MD/JSON, Excel y **PDF** (pypdf, 60 págs/20k car.).
 
 ## Roles
 - **ADMIN**: todas las mutaciones (vehículos, stock, precios, financiación, promociones, documentos, FAQ, memoria, argumentario, settings).

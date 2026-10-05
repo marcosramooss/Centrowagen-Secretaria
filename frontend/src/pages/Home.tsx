@@ -11,6 +11,7 @@ import { apiGet } from "@/lib/api";
 import { eur, fmtDate, fmtDateTime } from "@/lib/format";
 import { useMe } from "@/lib/session";
 import type { Promotion, Stats, StockUnit } from "@/lib/types";
+import type { TaskSummary } from "@/lib/types2";
 
 const CHIPS = [
   "Busca T-Roc en stock",
@@ -30,6 +31,7 @@ export default function Home() {
     retry: false,
   });
   const promos = useQuery({ queryKey: ["promotions"], queryFn: () => apiGet<Promotion[]>("/promotions"), retry: false });
+  const tasks = useQuery({ queryKey: ["tasks-summary"], queryFn: () => apiGet<TaskSummary>("/tasks/summary"), retry: false });
 
   const s = stats.data;
   const cards = [
@@ -117,6 +119,74 @@ export default function Home() {
           </div>
           <p className="mt-1 text-lg font-semibold text-white">{s ? s.sales : "—"}</p>
         </Link>
+      </section>
+
+      {/* Reminders */}
+      <section className="mt-6" data-testid="home-reminders">
+        <div className="glass-panel rounded-2xl p-5">
+          <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
+            <h3 className="text-base font-semibold text-white">🔔 Seguimiento del día</h3>
+            <Link to="/tareas" className="text-xs text-sky-400 hover:underline" data-testid="home-view-all-tasks">
+              Ver todos los recordatorios
+            </Link>
+          </div>
+
+          <div className="mb-4 flex flex-wrap gap-2">
+            <span
+              className={`rounded-full border px-3 py-1 text-xs font-medium ${
+                (tasks.data?.overdue ?? 0) > 0
+                  ? "border-rose-500/40 bg-rose-500/15 text-rose-300"
+                  : "border-slate-700/60 bg-slate-900/60 text-slate-400"
+              }`}
+              data-testid="home-tasks-overdue"
+            >
+              {tasks.data?.overdue ?? 0} vencidas
+            </span>
+            <span
+              className={`rounded-full border px-3 py-1 text-xs font-medium ${
+                (tasks.data?.today ?? 0) > 0
+                  ? "border-amber-500/40 bg-amber-500/15 text-amber-300"
+                  : "border-slate-700/60 bg-slate-900/60 text-slate-400"
+              }`}
+              data-testid="home-tasks-today"
+            >
+              {tasks.data?.today ?? 0} para hoy
+            </span>
+            <span className="rounded-full border border-slate-700/60 bg-slate-900/60 px-3 py-1 text-xs text-slate-400">
+              {tasks.data?.upcoming ?? 0} próximos 7 días
+            </span>
+          </div>
+
+          {(tasks.data?.next_tasks ?? []).length === 0 ? (
+            <p className="text-sm text-muted-foreground">
+              Sin recordatorios pendientes. Crea uno para no perder ningún seguimiento.
+            </p>
+          ) : (
+            <div className="space-y-2">
+              {(tasks.data?.next_tasks ?? []).map((t) => (
+                <Link
+                  key={t.id}
+                  to="/tareas"
+                  className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-slate-700/50 bg-slate-900/40 px-3 py-2 transition-colors duration-200 hover:border-sky-500/40"
+                  data-testid={`home-task-${t.id}`}
+                >
+                  <div className="min-w-0">
+                    <p className="truncate text-sm font-medium text-slate-100">{t.title}</p>
+                    <p className="truncate text-[11px] text-muted-foreground">
+                      {t.kind}
+                      {t.client_name ? ` · ${t.client_name}` : ""}
+                      {t.vehicle_model ? ` · ${t.vehicle_model}` : ""}
+                    </p>
+                  </div>
+                  <span className="text-xs text-slate-400">
+                    {fmtDate(t.due_date)}
+                    {t.due_time ? ` · ${t.due_time}` : ""}
+                  </span>
+                </Link>
+              ))}
+            </div>
+          )}
+        </div>
       </section>
 
       {/* Section cards */}

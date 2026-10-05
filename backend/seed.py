@@ -386,6 +386,15 @@ SALES = [
 COMMISSION_RATE = 3.0
 MONTHLY_TARGET = 600000.0
 
+# title, kind, client, phone, vehicle, days_from_today, time, priority
+TASKS = [
+    ("Llamar a María para confirmar la financiación", "Llamada", "María López", "600 111 222", "Golf R-Line 1.5 TSI DSG", 0, "10:30", "alta"),
+    ("Enviar oferta del T-Roc por WhatsApp", "WhatsApp", "Carlos Ruiz", "600 333 444", "T-Roc R-Line DSG", 0, "17:00", "media"),
+    ("Seguimiento: no contestó la semana pasada", "Seguimiento", "Ana Martín", "600 555 666", "Tiguan R-Line", -4, None, "alta"),
+    ("Preparar la entrega del ID.4 y emparejar la App", "Entrega", "Javier Serrano", "600 777 888", "ID.4 Pro", 2, "09:30", "media"),
+    ("Prueba dinámica del ID.3 con el cliente", "Prueba dinámica", "Lucía Fernández", "600 999 000", "ID.3 Pro", 4, "16:15", "baja"),
+]
+
 
 async def main(force: bool = False) -> None:
     existing = await db.vehicles.count_documents({})
@@ -394,7 +403,8 @@ async def main(force: bool = False) -> None:
         return
     if force:
         for coll in ["vehicles", "stock", "prices", "financing", "promotions", "documents", "faq",
-                     "memory", "argumentario", "users", "sessions", "sales", "settings", "chats", "messages"]:
+                     "memory", "argumentario", "users", "sessions", "sales", "settings", "chats", "messages",
+                     "tasks", "client_messages", "cron_runs"]:
             await db[coll].delete_many({})
     await ensure_indexes()
 
@@ -515,6 +525,17 @@ async def main(force: bool = False) -> None:
         })
 
     await db.settings.insert_one({"key": "ventas", "commission_rate": COMMISSION_RATE, "monthly_target": MONTHLY_TARGET})
+
+    # Recordatorios de seguimiento (del vendedor) ------------------------------
+    seller = USERS[1]
+    for title, kind, client, phone, vehicle, delta, time_str, priority in TASKS:
+        await db.tasks.insert_one({
+            "id": new_id(), "owner_id": seller["id"], "owner_name": seller["name"],
+            "title": title, "kind": kind, "client_name": client, "client_phone": phone,
+            "client_email": None, "vehicle_model": vehicle,
+            "due_date": days_from_now(delta), "due_time": time_str, "priority": priority,
+            "notes": "", "status": "pendiente", "created_at": updated(5), "completed_at": None,
+        })
 
     print("Seed completado — DATOS DE DEMOSTRACIÓN cargados (17 vehículos, 23 unidades de stock, 10 planes de financiación, 8 promociones).")
     print("Cuentas: doncipotecheats@gmail.com / admin123 (ADMIN) · vendedor@centrowagen.es / vendedor123 (VENDEDOR)")

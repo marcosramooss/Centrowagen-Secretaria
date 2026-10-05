@@ -24,7 +24,7 @@ router = APIRouter(tags=["knowledge"])
 
 
 def _extract_text(filename: str, data: bytes) -> str:
-    """Extract plain text for the RAG layer; PDF/DOCX stay metadata-only this phase."""
+    """Extract plain text for the RAG layer (TXT/CSV/MD/JSON, Excel and PDF)."""
     suffix = filename.lower().rsplit(".", 1)[-1] if "." in filename else ""
     try:
         if suffix in {"txt", "csv", "md", "json"}:
@@ -40,6 +40,22 @@ def _extract_text(filename: str, data: bytes) -> str:
                     if line.strip(" |"):
                         lines.append(line)
             return "\n".join(lines)[:20000]
+        if suffix == "pdf":
+            # Catálogos y circulares: el texto se indexa para que SecretarIA pueda citarlos.
+            from pypdf import PdfReader
+
+            reader = PdfReader(io.BytesIO(data))
+            parts: list[str] = []
+            for page in reader.pages[:60]:
+                try:
+                    text = (page.extract_text() or "").strip()
+                except Exception:
+                    continue
+                if text:
+                    parts.append(text)
+                if sum(len(p) for p in parts) > 20000:
+                    break
+            return "\n\n".join(parts)[:20000]
         return ""
     except Exception:
         return ""

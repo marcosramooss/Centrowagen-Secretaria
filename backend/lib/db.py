@@ -50,6 +50,11 @@ INDEXES: dict[str, list[IndexModel]] = {
     "chats": [IndexModel([("user_id", ASCENDING), ("updated_at", DESCENDING)], name="user_updated")],
     "messages": [IndexModel([("chat_id", ASCENDING), ("created_at", ASCENDING)], name="chat_created")],
     "sales": [IndexModel([("user_id", ASCENDING), ("sale_date", DESCENDING)], name="user_sale_date")],
+    "tasks": [
+        IndexModel([("owner_id", ASCENDING), ("due_date", ASCENDING)], name="owner_due"),
+        IndexModel([("status", ASCENDING)], name="status"),
+    ],
+    "cron_runs": [IndexModel([("run_id", ASCENDING)], name="run_id", unique=True)],
     "settings": [IndexModel([("key", ASCENDING)], name="key", unique=True)],
 }
 

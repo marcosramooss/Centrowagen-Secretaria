@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Send, Square } from "lucide-react";
 import { toast } from "sonner";
 
@@ -9,14 +9,17 @@ import SecretariaAvatar from "@/components/SecretariaAvatar";
 import { DemoPill, SourcePill } from "@/components/bits";
 import { useMode } from "@/components/ModeContext";
 import { Button } from "@/components/ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { apiStream } from "@/lib/api";
+import { apiGet, apiStream } from "@/lib/api";
 import type { SourceRef } from "@/lib/types";
+import type { AiModel } from "@/lib/types2";
 
 interface Turn {
   role: "user" | "assistant";
   content: string;
   sources?: SourceRef[];
+  engine?: string;
 }
 
 const COMMANDS = [
@@ -52,6 +55,12 @@ export default function Asistente() {
   const chatId = useRef<string | null>(null);
   const bottom = useRef<HTMLDivElement>(null);
   const sentInitial = useRef(false);
+  const [engine, setEngine] = useState(() => localStorage.getItem("secretaria-engine") || "claude");
+  const models = useQuery({ queryKey: ["ai-models"], queryFn: () => apiGet<AiModel[]>("/ai/models"), retry: false });
+
+  useEffect(() => {
+    localStorage.setItem("secretaria-engine", engine);
+  }, [engine]);
 
   useEffect(() => {
     bottom.current?.scrollIntoView({ behavior: "smooth", block: "end" });
@@ -64,12 +73,16 @@ export default function Asistente() {
     setBusy(true);
     setTurns((t) => [...t, { role: "user", content: message }, { role: "assistant", content: "" }]);
     try {
-      await apiStream("/chat", { message, chat_id: chatId.current, mode }, (ev) => {
+      await apiStream("/chat", { message, chat_id: chatId.current, mode, model: engine }, (ev) => {
         if (ev.type === "meta") {
           if (ev.chat_id) chatId.current = ev.chat_id;
           setTurns((t) => {
             const next = [...t];
-            next[next.length - 1] = { ...next[next.length - 1], sources: ev.sources ?? [] };
+            next[next.length - 1] = {
+              ...next[next.length - 1],
+              sources: ev.sources ?? [],
+              engine: (ev as { engine?: string }).engine,
+            };
             return next;
           });
         } else if (ev.type === "delta" && ev.content) {
@@ -123,7 +136,24 @@ export default function Asistente() {
             </p>
           </div>
         </div>
-        <DemoPill />
+        <div className="flex items-center gap-2">
+          <Select value={engine} onValueChange={setEngine}>
+            <SelectTrigger className="w-[196px]" data-testid="ai-engine-select">
+              <SelectValue>
+                {(v) => (models.data ?? []).find((m) => m.key === v)?.label ?? "Motor de IA"}
+              </SelectValue>
+            </SelectTrigger>
+            <SelectContent>
+              {(models.data ?? []).map((m) => (
+                <SelectItem key={m.key} value={m.key}>
+                  {m.label}
+                  {m.default ? " ·  recomendado" : ""}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <DemoPill />
+        </div>
       </div>
 
       {/* Conversation */}
@@ -178,7 +208,12 @@ export default function Asistente() {
                       </div>
                     )}
                     {t.sources && t.sources.length > 0 && t.content && (
-                      <div className="mt-3 flex flex-wrap gap-1.5 border-t border-slate-700/50 pt-3" data-testid="chat-sources">
+                      <div className="mt-3 flex flex-wrap items-center gap-1.5 border-t border-slate-700/50 pt-3" data-testid="chat-sources">
+                        {t.engine && (
+                          <span className="rounded-full border border-slate-600/60 bg-slate-900/70 px-2 py-1 text-[10px] text-slate-400" data-testid="chat-engine-label">
+                            🤖 {t.engine}
+                          </span>
+                        )}
                         {t.sources.map((s, si) => (
                           <SourcePill key={si} source={s} />
                         ))}

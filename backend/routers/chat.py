@@ -8,7 +8,7 @@ from fastapi.responses import StreamingResponse
 from lib.auth import get_current_user
 from lib.db import db
 from lib.doc import new_id, now_utc, prepare
-from lib.llm import stream_completion
+from lib.llm import model_label, stream_completion
 from lib.rag import build_system_prompt, context_sources, retrieve
 from models.chat import ChatMeta, ChatMsg, ChatSend
 
@@ -63,10 +63,12 @@ async def chat(payload: ChatSend, user: dict = Depends(get_current_user)):
     )
 
     async def gen():
-        yield _sse({"type": "meta", "chat_id": chat_id, "sources": sources})
+        yield _sse({"type": "meta", "chat_id": chat_id, "sources": sources, "engine": model_label(payload.model)})
         chunks: list[str] = []
         try:
-            async for delta in stream_completion(system, user_text, session_id=f"secretaria-{new_id()}"):
+            async for delta in stream_completion(
+                system, user_text, session_id=f"secretaria-{new_id()}", model_key=payload.model
+            ):
                 chunks.append(delta)
                 yield _sse({"type": "delta", "content": delta})
         except Exception as exc:  # never strand the UI without a close event

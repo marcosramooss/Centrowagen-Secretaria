@@ -18,6 +18,8 @@ import Argumentario from "@/pages/Argumentario";
 import Memoria from "@/pages/Memoria";
 import Auditoria from "@/pages/Auditoria";
 import ClienteMensaje from "@/pages/ClienteMensaje";
+import Tareas from "@/pages/Tareas";
+import ImportarTarifas from "@/pages/ImportarTarifas";
 import Ventas from "@/pages/Ventas";
 import Configuracion from "@/pages/Configuracion";
 
@@ -47,6 +49,8 @@ function AppRoutes() {
           <Route path="/memoria" element={<Memoria />} />
           <Route path="/auditoria" element={<Auditoria />} />
           <Route path="/cliente" element={<ClienteMensaje />} />
+          <Route path="/tareas" element={<Tareas />} />
+          <Route path="/importar" element={<ImportarTarifas />} />
           <Route path="/ventas" element={<Ventas />} />
           <Route path="/configuracion" element={<Configuracion />} />
         </Route>

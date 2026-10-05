@@ -12,6 +12,7 @@ class ChatSend(BaseModel):
     message: str
     chat_id: str | None = None
     mode: str = "vendedor"  # vendedor | cliente
+    model: str | None = None  # clave de lib.llm.MODELS (claude | chatgpt | …)
 
 
 class ChatMeta(BaseModel):
@@ -36,6 +37,7 @@ class ClientMessageIn(BaseModel):
     client_name: str | None = None
     model: str | None = None
     question: str = ""
+    engine: str | None = None  # clave de lib.llm.MODELS
 
 
 class ClientMessageCreate(BaseModel):

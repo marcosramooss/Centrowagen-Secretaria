@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { NavLink, Outlet, useLocation } from "react-router-dom";
 import {
-  BadgePercent, BookOpen, Bot, Brain, Calculator, Car, Columns3, FileText,
+  BadgePercent, BellRing, BookOpen, Bot, Brain, Calculator, Car, Columns3, FileText,
   HelpCircle, LayoutDashboard, LogOut, Mail, Menu, RefreshCw, Settings, ShieldCheck,
-  Sparkles, Tag, Warehouse, X,
+  Sparkles, Tag, Upload, Warehouse, X,
 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 
@@ -12,17 +12,20 @@ import { DemoPill } from "@/components/bits";
 import { useMode } from "@/components/ModeContext";
 import { Button } from "@/components/ui/button";
 import { apiGet } from "@/lib/api";
-import { fmtDateTime } from "@/lib/format";
+import { fmtDate, fmtDateTime } from "@/lib/format";
 import { endSession, useMe } from "@/lib/session";
 import type { Stats } from "@/lib/types";
+import type { TaskSummary } from "@/lib/types2";
 import { cn } from "@/lib/utils";
 
 const NAV = [
   { to: "/", label: "Inicio", icon: LayoutDashboard },
   { to: "/asistente", label: "Asistente IA", icon: Bot, badge: "IA" },
+  { to: "/tareas", label: "Recordatorios", icon: BellRing, counter: true },
   { to: "/vehiculos", label: "Vehículos VW", icon: Car },
   { to: "/stock", label: "Stock en vivo", icon: Warehouse },
   { to: "/precios", label: "Precios & Tarifas", icon: Tag },
+  { to: "/importar", label: "Importar tarifa", icon: Upload },
   { to: "/financiacion", label: "Financiación", icon: Calculator },
   { to: "/promociones", label: "Promociones", icon: Sparkles },
   { to: "/comparador", label: "Comparador", icon: Columns3 },
@@ -41,9 +44,17 @@ export default function AppShell() {
   const { mode, setMode } = useMode();
   const location = useLocation();
   const [open, setOpen] = useState(false);
+  const [bellOpen, setBellOpen] = useState(false);
   const { data: stats } = useQuery({ queryKey: ["stats"], queryFn: () => apiGet<Stats>("/stats"), retry: false });
+  const { data: taskSummary } = useQuery({
+    queryKey: ["tasks-summary"],
+    queryFn: () => apiGet<TaskSummary>("/tasks/summary"),
+    retry: false,
+    refetchInterval: 120000, // keep the bell fresh while the seller works
+  });
 
   const lastSync = stats?.last_sync?.stock ?? stats?.last_sync?.prices ?? null;
+  const alerts = (taskSummary?.overdue ?? 0) + (taskSummary?.today ?? 0);
 
   return (
     <div className="min-h-svh">
@@ -76,7 +87,7 @@ export default function AppShell() {
         </div>
 
         <nav className="flex-1 space-y-0.5 overflow-y-auto px-3 pb-4">
-          {NAV.map(({ to, label, icon: Icon, badge }) => (
+          {NAV.map(({ to, label, icon: Icon, badge, counter }) => (
             <NavLink
               key={to}
               to={to}
@@ -86,7 +97,7 @@ export default function AppShell() {
                 cn(
                   "group flex items-center gap-3 rounded-xl px-3 py-2 text-sm transition-colors duration-200",
                   isActive
-                    ? "bg-sky-600/18 font-medium text-sky-300"
+                    ? "bg-sky-600/18 font-medium text-sky-300 shadow-[inset_2px_0_0_0_#38bdf8]"
                     : "text-slate-400 hover:bg-slate-800/50 hover:text-slate-100",
                 )
               }
@@ -97,6 +108,14 @@ export default function AppShell() {
               {badge && (
                 <span className="ml-auto rounded-full bg-sky-600/30 px-1.5 py-0.5 text-[10px] font-bold text-sky-300">
                   {badge}
+                </span>
+              )}
+              {counter && alerts > 0 && (
+                <span
+                  className="ml-auto rounded-full bg-rose-500/90 px-1.5 py-0.5 text-[10px] font-bold text-white"
+                  data-testid="nav-tasks-counter"
+                >
+                  {alerts}
                 </span>
               )}
             </NavLink>
@@ -139,6 +158,82 @@ export default function AppShell() {
             <div className="hidden items-center gap-1.5 text-xs text-slate-400 md:flex" data-testid="sync-indicator">
               <RefreshCw className="h-3.5 w-3.5" />
               <span>{lastSync ? fmtDateTime(lastSync) : "Sin sincronizar"}</span>
+            </div>
+
+            <div className="relative">
+              <Button
+                variant="ghost"
+                size="icon-sm"
+                onClick={() => setBellOpen((o) => !o)}
+                className="relative"
+                data-testid="notifications-bell-button"
+                aria-label="Avisos de recordatorios"
+              >
+                <BellRing className={cn("h-4 w-4", alerts > 0 && "text-amber-300")} />
+                {alerts > 0 && (
+                  <span
+                    className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-rose-500 px-1 text-[9px] font-bold text-white"
+                    data-testid="notifications-badge"
+                  >
+                    {alerts}
+                  </span>
+                )}
+              </Button>
+
+              {bellOpen && (
+                <>
+                  <div className="fixed inset-0 z-30" onClick={() => setBellOpen(false)} aria-hidden />
+                  <div
+                    className="glass-panel absolute right-0 z-40 mt-2 w-[330px] rounded-2xl p-4"
+                    data-testid="notifications-panel"
+                  >
+                    <div className="flex items-center justify-between gap-2">
+                      <p className="text-sm font-semibold text-white">Avisos</p>
+                      <NavLink
+                        to="/tareas"
+                        onClick={() => setBellOpen(false)}
+                        className="text-xs text-sky-400 hover:underline"
+                        data-testid="notifications-view-all"
+                      >
+                        Ver todos
+                      </NavLink>
+                    </div>
+                    <div className="mt-2 flex gap-2 text-[11px]">
+                      <span className="rounded-full border border-rose-500/40 bg-rose-500/15 px-2 py-0.5 text-rose-300">
+                        {taskSummary?.overdue ?? 0} vencidas
+                      </span>
+                      <span className="rounded-full border border-amber-500/40 bg-amber-500/15 px-2 py-0.5 text-amber-300">
+                        {taskSummary?.today ?? 0} para hoy
+                      </span>
+                    </div>
+                    <div className="mt-3 space-y-2">
+                      {(taskSummary?.next_tasks ?? []).length === 0 ? (
+                        <p className="text-xs text-muted-foreground">Sin recordatorios pendientes. 🎉</p>
+                      ) : (
+                        (taskSummary?.next_tasks ?? []).map((t) => (
+                          <NavLink
+                            key={t.id}
+                            to="/tareas"
+                            onClick={() => setBellOpen(false)}
+                            className="block rounded-xl border border-slate-700/50 bg-slate-900/50 p-2.5 transition-colors duration-200 hover:border-sky-500/40"
+                            data-testid={`notification-item-${t.id}`}
+                          >
+                            <p className="truncate text-xs font-medium text-slate-100">{t.title}</p>
+                            <p className="mt-0.5 truncate text-[10px] text-muted-foreground">
+                              {t.kind} · {fmtDate(t.due_date)}
+                              {t.due_time ? ` · ${t.due_time}` : ""}
+                              {t.client_name ? ` · ${t.client_name}` : ""}
+                            </p>
+                          </NavLink>
+                        ))
+                      )}
+                    </div>
+                    <p className="mt-3 text-[10px] text-muted-foreground">
+                      Cada mañana a las 08:00 recibes este resumen por email.
+                    </p>
+                  </div>
+                </>
+              )}
             </div>
 
             <div
