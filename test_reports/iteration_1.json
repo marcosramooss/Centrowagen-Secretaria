@@ -1,0 +1,89 @@
+{
+  "iteration": 1,
+  "summary": "8/8 acceptance criteria exercised. All 8 browser checks and all 3 backend test files (7 pytest cases) pass. No bugs found.",
+  "passed": 11,
+  "failed": 0,
+  "note_criteria_count": "Acceptance matrix has exactly 8 criteria; all 8 covered (one browser check each, plus 3 backend test files for API-bearing criteria: auditoria, promociones status, ventas permissions).",
+  "bugs": [],
+  "action_items": [],
+  "retest_needed": false,
+  "checks": [
+    {
+      "criterion": "Login con roles y gating de rutas",
+      "name": "auth-login-role-gating",
+      "lane": "browser",
+      "status": "passed",
+      "evidence": "Unauthenticated visit to /stock redirected to /login; wrong password showed 'Credenciales incorrectas' toast and stayed on /login; vendedor login showed role VENDEDOR in user-profile; logout returned to /login and /stock again redirected; admin login showed role ADMIN."
+    },
+    {
+      "criterion": "El asistente IA responde en streaming usando SOLO los datos de la base y nunca inventa",
+      "name": "asistente-chat-streaming-grounded",
+      "lane": "browser",
+      "status": "passed",
+      "evidence": "chat-thinking appeared then resolved; T-Roc query response (ai-response-content) contained CB-1021/CB-1033/CB-1034 with prices and source-pill elements; Amarok query produced '⚠️ No tengo este dato confirmado...' disclaimer with no invented price. Backend /api/chat SSE stream confirmed via curl to include the same stock numbers/prices."
+    },
+    {
+      "criterion": "Página de Stock: filtros combinables y las dos vistas",
+      "name": "stock-filters-combinable",
+      "lane": "browser",
+      "status": "passed",
+      "evidence": "stock-result-count showed '23 de 23 unidades' then '6 de 23 unidades' after max-price=32000 with all visible card prices <=32000; 'Limpiar filtros' restored 23; stock-table view showed 23 rows; cards view restored; 'Ver ficha' navigated to vehiculo-detalle-page."
+    },
+    {
+      "criterion": "Ficha de vehículo completa con todas sus pestañas",
+      "name": "vehicle-detail-tabs",
+      "lane": "browser",
+      "status": "passed",
+      "evidence": "T-Roc R-Line and ID.4 Pro detail pages showed vehicle-price/vehicle-monthly; all 7 tabs (resumen, equipamiento, tecnico, stock, financiacion, argumentario, faq) rendered non-empty content; financiacion tab showed the verification warning text and vehicle-financing-* cards."
+    },
+    {
+      "criterion": "Comparador de hasta 4 vehículos con resalte de diferencias",
+      "name": "comparador-max-four",
+      "lane": "browser",
+      "status": "passed",
+      "evidence": "Empty state shown initially; adding 4 vehicles produced comparador-table with 5 header columns (label + 4); add selector showed 'Máximo 4 vehículos' at cap; Potencia row had exactly 1 highlighted best cell; compare-remove-* removed a column; 'Vaciar comparativa' returned to comparador-empty."
+    },
+    {
+      "criterion": "Promociones: estado calculado con fecha de hoy",
+      "name": "promotions-status-tabs",
+      "lane": "browser",
+      "status": "passed",
+      "evidence": "Vigentes tab hid 'Taigo Verano' and 'Golf GTI Lanzamiento'; Finalizadas tab showed both with promo-status-finalizada badges; Activas tab showed promo-status-activa; Próximas tab showed promo-status-proxima including 'T-Roc Edición Limitada'."
+    },
+    {
+      "criterion": "Promociones: estado calculado con fecha de hoy (API)",
+      "name": "test_tscheck_promotions_status.py",
+      "lane": "backend",
+      "status": "passed",
+      "evidence": "GET /api/promotions -> 200; 'Taigo Verano' and 'Golf GTI Lanzamiento' status == 'finalizada'; 'T-Roc Edición Limitada' status == 'proxima'; at least one of activa/proxima/programada present."
+    },
+    {
+      "criterion": "Auditoría determinista de datos: confirma, avisa o rechaza",
+      "name": "auditoria-ui-confirmado",
+      "lane": "browser",
+      "status": "passed",
+      "evidence": "T-Roc @ 35020 -> audit-result-estado contains CONFIRMADO with matches/sources; T-Roc @ 99999 -> estado not CONFIRMADO; Taigo promo @ 2000 -> estado INCORRECTO/DESACTUALIZADO with 'finaliz...' text."
+    },
+    {
+      "criterion": "Auditoría determinista de datos (API)",
+      "name": "test_tscheck_audit_deterministic.py",
+      "lane": "backend",
+      "status": "passed",
+      "evidence": "POST /api/audit {T-Roc,35020} -> 200, estado=confirmado with tarifa/stock matches and sources; {T-Roc,99999} -> estado!=confirmado; {Taigo promo,2000} -> estado=incorrecto, mensaje mentions campaign ended."
+    },
+    {
+      "criterion": "Ventas y comisiones: registrar venta actualiza tabla y KPIs; permiso de borrado respetado",
+      "name": "ventas-register-sale-updates-kpis",
+      "lane": "browser",
+      "status": "passed",
+      "evidence": "ventas-table started with 4 rows; submitting without client/PVP left 4 rows; full form (PVP 52470, descuento 2470) added a 5th row, kpi-month-sales incremented by 1, kpi-month-commission changed; deleting the created sale returned to 4 rows and reverted kpi-month-sales."
+    },
+    {
+      "criterion": "Ventas y comisiones: permiso de borrado por rol (API)",
+      "name": "test_tscheck_sales_permissions.py",
+      "lane": "backend",
+      "status": "passed",
+      "evidence": "POST /api/sales (tscheck-sale-*, pvp=52470, discount=2470) -> commission_estimated=1500.0, appears in GET /api/sales, DELETE succeeds and removes it. Separately: vendedor DELETE /api/sales/{admin-owned-sale} -> 403, and the sale remained present afterward."
+    }
+  ]
+}
