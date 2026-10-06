@@ -3,15 +3,8 @@ import type { ReactNode } from "react";
 import { fmtDate } from "@/lib/format";
 import type { PromoStatus, SourceRef } from "@/lib/types";
 
-export function DemoPill({ className = "" }: { className?: string }) {
-  return (
-    <span
-      className={`inline-flex items-center gap-1 rounded-full border border-amber-500/40 bg-amber-500/20 px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wider text-amber-300 ${className}`}
-      data-testid="demo-data-pill"
-    >
-      Datos de demostración
-    </span>
-  );
+export function DemoPill(_: { className?: string }) {
+  return null;
 }
 
 export function SourcePill({ source }: { source: SourceRef }) {
