@@ -1,7 +1,7 @@
 """Chat + client-message-generator models + stored client-message records."""
 
 from datetime import datetime
-from typing import Any
+from typing import Any, Literal
 
 from pydantic import BaseModel, EmailStr, Field
 
@@ -9,9 +9,9 @@ from lib.doc import new_id, now_utc
 
 
 class ChatSend(BaseModel):
-    message: str
+    message: str = Field(min_length=1, max_length=4000)
     chat_id: str | None = None
-    mode: str = "vendedor"  # vendedor | cliente
+    mode: Literal['vendedor', 'cliente'] = 'vendedor'
     model: str | None = None  # clave de lib.llm.MODELS (claude | chatgpt | …)
 
 
@@ -29,6 +29,8 @@ class ChatMsg(BaseModel):
     content: str
     sources: list[dict[str, Any]] = []
     created_at: datetime
+    engine: str = 'Consulta local · sin IA generativa'
+    external_help: bool = False
 
 
 class ClientMessageIn(BaseModel):

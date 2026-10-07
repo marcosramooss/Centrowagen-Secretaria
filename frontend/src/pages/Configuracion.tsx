@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { apiGet, apiPut } from "@/lib/api";
+import { apiGet, apiPut, apiPost } from "@/lib/api";
 import { fmtDateTime } from "@/lib/format";
 import { useMe } from "@/lib/session";
 import type { SalesSettings, Stats, User } from "@/lib/types";
@@ -65,6 +65,11 @@ export default function Configuracion() {
   });
 
   const s = stats.data;
+  const promote = useMutation({
+    mutationFn: (id: string) => apiPost<User>(`/auth/users/${id}/promote`),
+    onSuccess: () => { toast.success("Permisos de administrador actualizados"); void qc.invalidateQueries({ queryKey: ["users"] }); void qc.invalidateQueries({ queryKey: ["me"] }); },
+    onError: () => toast.error("No se pudieron actualizar los permisos"),
+  });
 
   return (
     <div data-testid="configuracion-page">
@@ -208,7 +213,7 @@ export default function Configuracion() {
             <Row label="Última sinc. de precios" value={s?.last_sync?.prices ? fmtDateTime(s.last_sync.prices) : "—"} />
             <Row
               label="Origen de los datos"
-              value={<span className="text-amber-300">DATOS DE DEMOSTRACIÓN</span>}
+              value={<span className="text-slate-300" data-testid="config-data-origin">Fuentes oficiales y archivos del concesionario; revisión por registro</span>}
             />
           </div>
         </TabsContent>
@@ -228,6 +233,7 @@ export default function Configuracion() {
                     <p className="text-[11px] text-muted-foreground">{u.email}</p>
                   </div>
                   <span
+                    data-testid={`config-user-role-${u.id}`}
                     className={
                       u.role === "admin"
                         ? "rounded-full border border-sky-500/40 bg-sky-500/15 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-sky-300"
@@ -236,6 +242,7 @@ export default function Configuracion() {
                   >
                     {u.role}
                   </span>
+                  {isAdmin && u.role !== "admin" && <Button variant="outline" size="sm" disabled={promote.isPending} onClick={() => { if (window.confirm(`¿Dar permisos de ADMIN a ${u.email}?`)) promote.mutate(u.id); }} data-testid={`config-user-promote-${u.id}`}>Hacer administrador</Button>}
                 </div>
               ))}
             </div>
@@ -266,9 +273,10 @@ export default function Configuracion() {
           <div className="glass-panel rounded-2xl p-5" data-testid="config-integraciones">
             <h3 className="mb-4 text-base font-semibold text-white">Integraciones activas</h3>
             <div className="space-y-2">
-              <Integration name="Claude (Anthropic)" detail="Motor del asistente — claude-sonnet-5-5 y Opus 5.5, con RAG sobre la base de datos" ok />
-              <Integration name="ChatGPT (OpenAI)" detail="Motor alternativo seleccionable en el asistente — GPT-5.6 y GPT-5.4 mini" ok />
-              <Integration name="Resend (email gestionado)" detail="Mensajes a clientes y resumen diario de tareas a las 08:00" ok />
+              <Integration name="Consulta local" detail="Búsqueda en catálogo y archivos del proyecto, sin IA generativa ni créditos de IA" ok />
+              <Integration name="Chats externos" detail="Enlaces a Copilot, Gemini y ChatGPT cuando faltan datos. Sin API ni transferencia automática; sujetos a límites del proveedor" ok />
+              <Integration name="IA generativa integrada" detail="Desactivada por elección: no se usan claves de Google, Anthropic, OpenAI ni Emergent para el chat" />
+              <Integration name="Resend (email gestionado)" detail="Pendiente de recuperar su configuración. El envío de mensajes no está activado" />
               <Integration name="Google Sign-In (Emergent)" detail="Acceso con cuenta de Google — los nuevos accesos entran con perfil VENDEDOR" ok />
               <Integration name="Almacenamiento de archivos y medios" detail="Documentos y archivos guardados en almacenamiento duradero (sobrevive a los despliegues)" ok />
               <Integration name="Importación de tarifas Excel/CSV" detail="Sube la tarifa oficial y actualiza precios y stock con confirmación previa" ok />

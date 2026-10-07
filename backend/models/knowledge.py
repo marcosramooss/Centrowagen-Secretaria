@@ -20,6 +20,7 @@ class DocumentItem(BaseModel):
     active: bool = True
     content_text: str = ""  # texto extraíble para el RAG
     size_bytes: int | None = None
+    verification_status: str = 'pending'
 
 
 class FaqItem(BaseModel):

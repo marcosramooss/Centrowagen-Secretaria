@@ -1,10 +1,8 @@
-"""Borra TODO el contenido comercial de demostración — deja usuarios y configuración intactos.
+"""Borrado selectivo: SOLO registros marcados explícitamente como demo.
 
 Uso: cd /app/backend && python wipe_demo.py [--yes]
 
-Vacía: vehicles, stock, prices, financing, promotions, faq, memory, argumentario,
-documents, sales, chats, messages, client_messages.
-NO toca: users, sessions, google_sessions, settings, tasks, cron_runs.
+Sin marca inequívoca no se borra. Nunca vacía una colección ni toca usuarios/configuración.
 """
 
 import asyncio
@@ -15,7 +13,7 @@ from lib.db import db
 WIPE = [
     "vehicles", "stock", "prices", "financing", "promotions",
     "faq", "memory", "argumentario", "documents", "sales",
-    "chats", "messages", "client_messages",
+    "chats", "messages", "client_messages", "tasks",
 ]
 
 
@@ -24,9 +22,10 @@ async def main(confirmed: bool) -> None:
         print("Añade --yes para confirmar el borrado de los datos de demostración.")
         return
     for name in WIPE:
-        res = await db[name].delete_many({})
+        marked = {'$or': [{'is_demo': True}, {'data_origin': 'demo'}]}
+        res = await db[name].delete_many(marked)
         print(f"{name}: {res.deleted_count} documentos borrados")
-    print("\nListo. La base queda vacía y preparada para los datos reales.")
+    print("\nSolo se han borrado marcas demo explícitas. Los registros sin marca se conservan para revisión.")
 
 
 if __name__ == "__main__":

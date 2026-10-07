@@ -2,7 +2,7 @@
 
 Acepta Excel (.xlsx) o CSV con cabecera en español. Reutiliza los helpers del
 importador de tarifas (lectura de tabla, normalización y números en formato español).
-Escribe directamente, emparejando por modelo+acabado (vehículos) y por nº de stock (stock).
+Helpers heredados. Las importaciones públicas pasan por intake: preview + apply.
 """
 
 import logging
@@ -60,11 +60,9 @@ STOCK_HEADERS: dict[str, list[str]] = {
 TEMPLATES = {
     "vehicles": (
         "Modelo;Acabado;Carroceria;Motor;Combustible;Potencia;Cambio;Traccion;Consumo;CO2;Autonomia;Maletero;Plazas;Equipamiento;Imagen;PVP\n"
-        "T-Roc;R-Line;SUV;1.5 TSI 150 CV;Gasolina;150;DSG;Delantera;6,1;139;;445;5;Faros LED|Cockpit digital;;34.990\n"
     ),
     "stock": (
         "N Stock;Modelo;Acabado;Motor;Potencia;Cambio;Color;Color interior;VIN;PVP;Promocional;Disponibilidad;Ubicacion;Entrega;Opciones\n"
-        "CB-1001;T-Roc;R-Line;1.5 TSI 150 CV;150;DSG;Blanco Puro;Negro;;34.990;33.500;Entrega inmediata;Don Benito;15 días;Techo panorámico|Park Assist\n"
     ),
 }
 
@@ -79,7 +77,7 @@ def _map_columns(rows: list[list[object]], headers: dict[str, list[str]], requir
             for ci, cell in enumerate(cells):
                 if not cell or ci in mapping.values():
                     continue
-                if cell in names or any(cell.startswith(n) for n in names):
+                if cell in {norm(n) for n in names}:
                     mapping[field] = ci
                     found[field] = str(row[ci])
                     break
@@ -135,7 +133,6 @@ async def list_model_images(_: dict = Depends(require_admin)):
     return [ModelImage(model_name=m, image=url) for m, url in MODEL_IMAGES.items()]
 
 
-@router.post("/import/vehicles", response_model=ImportResult)
 async def import_vehicles(file: UploadFile = File(...), _: dict = Depends(require_admin)):
     table = await _load_file(file)
     mapping, found, header_idx = _map_columns(table, VEHICLE_HEADERS, ["model"])
@@ -202,7 +199,6 @@ async def import_vehicles(file: UploadFile = File(...), _: dict = Depends(requir
     return result
 
 
-@router.post("/import/stock", response_model=ImportResult)
 async def import_stock(file: UploadFile = File(...), _: dict = Depends(require_admin)):
     table = await _load_file(file)
     mapping, found, header_idx = _map_columns(table, STOCK_HEADERS, ["stock_number", "model"])

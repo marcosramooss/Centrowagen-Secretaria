@@ -9,6 +9,8 @@ import io
 import logging
 import re
 import unicodedata
+import math
+import zipfile
 
 from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
 
@@ -66,21 +68,39 @@ def to_number(value: object) -> float | None:
 
 def _read_table(filename: str, data: bytes) -> list[list[object]]:
     ext = filename.lower().rsplit(".", 1)[-1] if "." in filename else ""
-    if ext in {"xlsx", "xlsm", "xls"}:
+    if ext in {"xlsx", "xlsm"}:
         from openpyxl import load_workbook
-
-        wb = load_workbook(io.BytesIO(data), read_only=True, data_only=True)
-        ws = wb.worksheets[0]
-        return [list(r) for r in ws.iter_rows(values_only=True)]
+        try:
+            with zipfile.ZipFile(io.BytesIO(data)) as archive:
+                if sum(z.file_size for z in archive.infolist()) > 40 * 1024 * 1024:
+                    raise HTTPException(413, 'Excel demasiado grande al descomprimir')
+            wb = load_workbook(io.BytesIO(data), read_only=True, data_only=True)
+            try:
+                ws = wb.worksheets[0]
+                if ws.max_row and ws.max_row > 5001:
+                    raise HTTPException(400, 'Máximo 5.000 filas por importación')
+                return [list(r) for r in ws.iter_rows(max_col=80, values_only=True)]
+            finally:
+                wb.close()
+        except HTTPException:
+            raise
+        except Exception:
+            raise HTTPException(400, 'Excel inválido o dañado. Usa un archivo .xlsx sin protección')
     if ext in {"csv", "txt"}:
-        text = data.decode("utf-8-sig", errors="ignore")
+        try:
+            text = data.decode('utf-8-sig')
+        except UnicodeDecodeError:
+            text = data.decode('cp1252')
         sample = text[:4000]
         try:
             dialect = csv.Sniffer().sniff(sample, delimiters=";,\t|")
             delim = dialect.delimiter
         except Exception:
             delim = ";" if sample.count(";") > sample.count(",") else ","
-        return [list(r) for r in csv.reader(io.StringIO(text), delimiter=delim)]
+        rows = [list(r) for r in csv.reader(io.StringIO(text), delimiter=delim)]
+        if len(rows) > 5001:
+            raise HTTPException(400, 'Máximo 5.000 filas por importación')
+        return rows
     raise HTTPException(status_code=400, detail="Formato no soportado. Sube un Excel (.xlsx) o un CSV.")
 
 
@@ -94,7 +114,7 @@ def _map_columns(rows: list[list[object]]) -> tuple[dict[str, int], dict[str, st
             for ci, cell in enumerate(cells):
                 if not cell or ci in mapping.values():
                     continue
-                if cell in names or any(cell.startswith(n) for n in names):
+                if cell in {norm(n) for n in names}:
                     mapping[field] = ci
                     found[field] = str(row[ci])
                     break
@@ -145,7 +165,7 @@ async def preview_tariff(file: UploadFile = File(...), _: dict = Depends(require
             status="no_reconocida",
         )
 
-        if not model or base is None or base <= 0:
+        if not model or base is None or not math.isfinite(base) or base <= 0:
             item.message = "Falta el modelo o el PVP es inválido"
             out.append(item)
             continue
@@ -195,6 +215,13 @@ async def apply_tariff(payload: TariffApplyIn, admin: dict = Depends(require_adm
     now = now_utc()
 
     for row in payload.rows:
+        for value in (row.base_price, row.promotional_price, row.financing_price, row.discount):
+            if value is not None and (not math.isfinite(value) or value < 0):
+                raise HTTPException(422, 'Los importes deben ser números finitos no negativos')
+        if row.base_price == 0 or (row.discount is not None and row.discount > 100):
+            raise HTTPException(422, 'PVP o descuento inválidos')
+
+    for row in payload.rows:
         # Only confirmed, matched rows are written — never a "nueva"/"no_reconocida".
         if row.status != "actualizable" or not row.vehicle_id or row.base_price is None:
             skipped += 1
@@ -212,6 +239,7 @@ async def apply_tariff(payload: TariffApplyIn, admin: dict = Depends(require_adm
             "campaign": row.campaign,
             "source": payload.source,
             "last_updated": now,
+            "verification_status": "pending",
         }
         existing = await db.prices.find_one({"vehicle_id": row.vehicle_id})
         if existing:
@@ -224,7 +252,7 @@ async def apply_tariff(payload: TariffApplyIn, admin: dict = Depends(require_adm
         if payload.update_stock:
             res = await db.stock.update_many(
                 {"vehicle_id": row.vehicle_id},
-                {"$set": {"pvp": row.base_price, "promotional_price": row.promotional_price, "last_updated": now}},
+                {"$set": {"pvp": row.base_price, "promotional_price": row.promotional_price, "last_updated": now, "verification_status": "pending"}},
             )
             stock_updated += res.modified_count
 

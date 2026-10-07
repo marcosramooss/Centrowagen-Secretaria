@@ -16,7 +16,7 @@ import type { DocumentItem } from "@/lib/types";
 const CATEGORIES = ["Tarifas", "Catálogos", "Campañas", "Stock", "Fichas técnicas", "Financiación", "Garantía", "Formación", "Procedimientos", "General"];
 const TYPES = ["PDF", "XLSX", "CSV", "DOCX", "Imagen"];
 
-export default function Documentos() {
+export default function Documentos({ embedded = false }: { embedded?: boolean }) {
   const qc = useQueryClient();
   const { data: me } = useMe();
   const isAdmin = me?.role === "admin";
@@ -59,11 +59,11 @@ export default function Documentos() {
 
   return (
     <div data-testid="documentos-page">
-      <PageHeader
+      {!embedded && <PageHeader
         title="📚 Documentación"
-        subtitle="Base documental que SecretarIA consulta para responder (tarifas, catálogos, campañas, fichas técnicas)."
+        subtitle="Archivos de referencia con trazabilidad. Subir un PDF no verifica sus datos ni los convierte en tarifa."
         right={<DemoPill />}
-      />
+      />}
 
       {isAdmin && (
         <form
@@ -124,6 +124,7 @@ export default function Documentos() {
               <Label className="text-xs">Archivo (PDF, Excel, CSV, Word, imagen)</Label>
               <Input
                 ref={fileRef}
+                required
                 type="file"
                 accept=".pdf,.xlsx,.xls,.csv,.doc,.docx,.txt,.png,.jpg,.jpeg"
                 className="file:mr-3 file:rounded-md file:border-0 file:bg-sky-600/30 file:px-3 file:py-1 file:text-xs file:text-sky-200"
@@ -134,9 +135,9 @@ export default function Documentos() {
               <Upload className="h-4 w-4" /> {upload.isPending ? "Subiendo…" : "Subir"}
             </Button>
           </div>
-          <p className="mt-2 text-[11px] text-muted-foreground">
-            El texto de los archivos TXT, CSV y Excel se indexa para que SecretarIA pueda citarlos. Los PDF y Word se
-            registran con su trazabilidad (nombre, fuente y fecha).
+          <p className="mt-2 text-xs leading-5 text-muted-foreground" data-testid="document-verification-notice">
+            PDF, TXT, CSV y Excel: se extrae el texto disponible. Un PDF escaneado puede no contener texto extraíble.
+            Los archivos quedan pendientes de revisión y excluidos de las respuestas confirmadas de la IA.
           </p>
         </form>
       )}
@@ -162,6 +163,7 @@ export default function Documentos() {
         <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3" data-testid="documentos-grid">
           {list.map((d) => (
             <div key={d.id} className="glass-card rounded-2xl p-4" data-testid={`document-card-${d.id}`}>
+              <p className="mb-3 text-xs text-amber-300" data-testid={`document-verification-${d.id}`}>{d.verification_status === "verified" ? "Revisado por el concesionario" : "No verificado automáticamente · Pendiente de revisión"}</p>
               <div className="flex items-start justify-between gap-3">
                 <div className="flex min-w-0 items-start gap-3">
                   <span className="rounded-lg border border-sky-500/30 bg-sky-500/10 px-2 py-1 font-mono text-[10px] text-sky-300">

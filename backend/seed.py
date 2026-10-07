@@ -397,6 +397,7 @@ TASKS = [
 
 
 async def main(force: bool = False) -> None:
+    raise RuntimeError('Seed demo deshabilitado. Configura el primer administrador en /login e importa documentación real.')
     existing = await db.vehicles.count_documents({})
     if existing and not force:
         print(f"La base ya contiene {existing} vehículos — seed omitido (usa --force para reiniciar).")

@@ -9,8 +9,14 @@ import { apiGet } from "@/lib/api";
 import { eur, fmtDate } from "@/lib/format";
 import type { PriceEntry, Vehicle } from "@/lib/types";
 import { cn } from "@/lib/utils";
+import OfficialCatalog from "@/components/OfficialCatalog";
 
 export default function Vehiculos() {
+  const [official, setOfficial] = useState(true);
+  return <div data-testid="vehicles-workspace"><div className="mb-7 flex flex-wrap gap-5 border-b border-slate-800 text-sm"><button type="button" onClick={() => setOfficial(true)} aria-pressed={official} className={cn("min-h-12 border-b-2 transition-colors", official ? "border-sky-400 text-white" : "border-transparent text-slate-400 hover:text-white")} data-testid="vehicles-official-tab">Gama oficial Volkswagen</button><button type="button" onClick={() => setOfficial(false)} aria-pressed={!official} className={cn("min-h-12 border-b-2 transition-colors", !official ? "border-sky-400 text-white" : "border-transparent text-slate-400 hover:text-white")} data-testid="vehicles-dealer-tab">Versiones del concesionario</button></div>{official ? <OfficialCatalog /> : <DealerVehicles />}</div>;
+}
+
+function DealerVehicles() {
   const [q, setQ] = useState("");
   const [body, setBody] = useState<string>("");
   const [fuel, setFuel] = useState<string>("");
@@ -41,8 +47,8 @@ export default function Vehiculos() {
   return (
     <div data-testid="vehiculos-page">
       <PageHeader
-        title="🚗 Vehículos"
-        subtitle="Catálogo de la gama Volkswagen con tarifa, fuente y fecha de actualización."
+        title="Versiones del concesionario"
+        subtitle="Datos de tus archivos. Una importación no acredita su verificación comercial."
         right={<DemoPill />}
       />
 
@@ -77,7 +83,7 @@ export default function Vehiculos() {
       {vehicles.isError ? (
         <EmptyState title="No se ha podido cargar el catálogo" hint="Comprueba la conexión con el servidor." />
       ) : list.length === 0 ? (
-        <EmptyState title="Sin vehículos con esos criterios" hint="Prueba a quitar algún filtro." />
+        <EmptyState title="Sin versiones registradas" hint="Importa tus archivos reales en Gestión de datos o revisa los filtros." />
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4" data-testid="vehiculos-grid">
           {list.map((v) => {
@@ -113,6 +119,7 @@ export default function Vehiculos() {
                   </div>
                 </div>
                 <div className="p-4">
+                  <p className="mb-2 text-[11px] text-amber-300" data-testid={`vehicle-verification-${v.id}`}>{v.verification_status === "verified" ? "Revisado por el concesionario" : "Pendiente de verificación comercial"}</p>
                   <div className="flex flex-wrap gap-x-3 gap-y-1 text-[11px] text-slate-400">
                     <span>🚗 {v.power_cv ?? "—"} CV</span>
                     <span>⚙️ {v.transmission?.split(" ")[0]}</span>

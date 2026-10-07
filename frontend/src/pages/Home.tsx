@@ -265,7 +265,7 @@ export default function Home() {
       </section>
 
       <p className="mt-6 text-xs text-muted-foreground" data-testid="home-disclaimer">
-        ⚠️ Todos los importes mostrados son DATOS DE DEMOSTRACIÓN. Verifica cualquier condición con la documentación
+        Verifica cualquier importe o condición registrada con la documentación
         oficial antes de presentarla como oferta definitiva al cliente.
       </p>
     </div>

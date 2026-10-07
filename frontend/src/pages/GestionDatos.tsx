@@ -11,7 +11,10 @@ import { apiDelete, apiGet, apiPatch, apiPost, apiPostForm } from "@/lib/api";
 import { eur } from "@/lib/format";
 import { useMe } from "@/lib/session";
 import type { FinancingOffer, PriceEntry, Promotion, StockUnit, Vehicle } from "@/lib/types";
-import type { ImportResult } from "@/lib/types2";
+import type { ImportResult } from "@/lib/catalog";
+import DataImportPanel from "@/components/DataImportPanel";
+import { Link } from "react-router-dom";
+import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 type FieldType = "text" | "number" | "textarea" | "list" | "checkbox" | "vehicle" | "date";
@@ -61,7 +64,7 @@ const ENTITIES: EntityDef[] = [
       { name: "trunk_l", label: "Maletero (l)", type: "number" },
       { name: "seats", label: "Plazas", type: "number" },
       { name: "equipment", label: "Equipamiento", type: "list", hint: "Separa cada elemento con ;" },
-      { name: "image", label: "Foto (URL)", type: "text", hint: "Si lo dejas vacío uso la foto de la gama 2026" },
+      { name: "image", label: "Foto (URL)", type: "text", hint: "URL de la fotografía exacta. Si no está confirmada, déjala vacía" },
       { name: "source", label: "Fuente", type: "text" },
       { name: "source_url", label: "URL de la fuente", type: "text" },
     ],
@@ -213,7 +216,7 @@ function toPayload(entity: EntityDef, state: FormState): Record<string, unknown>
     const text = String(raw ?? "").trim();
     if (!text) continue;
     if (f.type === "number") {
-      const num = Number(text.replace(/\./g, "").replace(",", "."));
+      const num = Number(text.includes(",") ? text.replace(/\./g, "").replace(",", ".") : /^\d{1,3}(\.\d{3})+$/.test(text) ? text.replace(/\./g, "") : text);
       if (!Number.isNaN(num)) payload[f.name] = num;
     } else if (f.type === "list") {
       payload[f.name] = text.split(";").map((p) => p.trim()).filter(Boolean);
@@ -288,8 +291,8 @@ export default function GestionDatos() {
   return (
     <div data-testid="gestion-page">
       <PageHeader
-        title="🗂️ Gestión de datos reales"
-        subtitle="Da de alta el catálogo, el stock, las tarifas, la financiación y las promociones oficiales: manualmente o importando el Excel/CSV del concesionario."
+        title="Gestión de datos"
+        subtitle="Tu información comercial, sin ejemplos ni cifras inventadas. Carga documentación real y revisa su procedencia."
       />
 
       {!isAdmin && (
@@ -298,7 +301,7 @@ export default function GestionDatos() {
         </div>
       )}
 
-      <ImportPanel isAdmin={isAdmin} onDone={invalidate} />
+      <div className="mb-6 flex flex-wrap items-center justify-between gap-4 rounded-xl border border-slate-800 bg-slate-900/50 p-4"><p className="text-sm text-slate-400" data-testid="gestion-files-guidance">Para cargar Excel, CSV o PDF, utiliza el Centro de archivos. Aquí puedes editar registros individualmente.</p><Link to="/archivos" className={buttonVariants({ variant: "outline" })} data-testid="gestion-files-link">Ir al Centro de archivos</Link></div>
 
       <div className="mb-4 flex flex-wrap gap-2" data-testid="gestion-tabs">
         {ENTITIES.map((e) => (

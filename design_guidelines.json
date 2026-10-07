@@ -1,255 +1,262 @@
 {
-  "project_name": "SecretarIA — Tu asistente comercial Volkswagen",
-  "organization": "Centrowagen Don Benito (Badajoz, España)",
-  "language": "es-ES",
-  "app_type": "dashboard",
-  "aesthetic_archetype": "Apple Liquid Glass Dark / Volkswagen Precision SaaS",
-  "typography": {
-    "font_family_primary": "Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
-    "font_family_heading": "Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
-    "font_family_mono": "'JetBrains Mono', 'IBM Plex Mono', monospace",
-    "font_import": "@import \"@fontsource-variable/inter\";",
-    "scale_px": {
-      "display": 52,
-      "h1": 38,
-      "h2": 28,
-      "h3": 20,
-      "body": 15,
-      "caption": 13
-    },
-    "rules": {
-      "h1": "font-bold tracking-tight text-white leading-tight",
-      "h2": "font-semibold tracking-tight text-slate-100",
-      "h3": "font-medium tracking-normal text-slate-200",
-      "body": "font-normal leading-relaxed text-slate-300",
-      "caption": "font-medium text-xs tracking-wider uppercase text-slate-400",
-      "numbers_prices": "font-semibold tracking-tight font-mono text-emerald-400"
-    }
-  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "project_name": "SecretarIA - Centrowagen Don Benito (Volkswagen Concesionario Oficial)",
+  "design_intent": "Dark, ultra-refined automotive executive aesthetic tailored for Volkswagen España dealerships (Passenger Cars & Volkswagen Commercial Vehicles). Blends precision engineering, verified data traceability, German industrial minimalism, and tactile executive cockpit ergonomics.",
+  "archetype": "ARCHETYPE 4: SWISS & HIGH-CONTRAST + ARCHETYPE 5: LUXURY AUTOMOTIVE",
+  "theme_polarity": "dark",
   "colors": {
-    "palette_name": "Volkswagen Obsidian & Liquid Electric Blue",
-    "vw_blue_accent": "#0066D6",
-    "vw_blue_deep": "#001E50",
-    "vw_cyan_glow": "#00D2FF",
-    "emerald_success": "#10B981",
-    "amber_warning": "#F59E0B",
-    "rose_danger": "#EF4444",
-    "accent": "#0066D6",
-    "on_accent": "#FFFFFF",
     "surfaces": [
       {
         "name": "page",
         "kind": "solid",
         "bg": "#090D14",
-        "on_bg": "#F8FAFC",
-        "on_bg_muted": "#94A3B8"
-      },
-      {
-        "name": "sidebar",
-        "kind": "glass",
-        "contrast_against": "#0B111E",
-        "guarantee": "backdrop-blur-2xl bg-slate-950/80 border-r border-slate-800/60 shadow-[4px_0_24px_rgba(0,0,0,0.5)]",
-        "on_bg": "#F1F5F9",
+        "on_bg": "#F0F4F8",
         "on_bg_muted": "#94A3B8",
         "roles": {
-          "active_nav": "#38BDF8",
-          "active_nav_bg": "rgba(0, 102, 214, 0.18)",
-          "badge_count": "#0284C7"
+          "link": "#60A5FA",
+          "error": "#F87171",
+          "success": "#34D399",
+          "warning": "#FBBF24",
+          "vw_brand": "#0066D6"
         }
       },
       {
         "name": "panel",
-        "kind": "glass",
-        "contrast_against": "#0F172A",
-        "guarantee": "backdrop-blur-xl bg-slate-900/60 border border-slate-800/80 shadow-[0_8px_32px_rgba(0,0,0,0.37)]",
+        "kind": "solid",
+        "bg": "#0F172A",
         "on_bg": "#F8FAFC",
         "on_bg_muted": "#94A3B8",
         "roles": {
           "link": "#38BDF8",
           "error": "#F87171",
           "success": "#34D399",
-          "warning": "#FBBF24"
+          "border": "#1E293B"
         }
       },
       {
         "name": "card_elevated",
-        "kind": "glass",
-        "contrast_against": "#141E33",
-        "guarantee": "backdrop-blur-md bg-gradient-to-b from-slate-800/50 to-slate-900/60 border border-slate-700/50 shadow-lg",
-        "on_bg": "#FFFFFF",
-        "on_bg_muted": "#94A3B8"
-      },
-      {
-        "name": "chat_user_bubble",
         "kind": "solid",
-        "bg": "#0066D6",
+        "bg": "#131D31",
         "on_bg": "#FFFFFF",
-        "on_bg_muted": "#E0F2FE"
+        "on_bg_muted": "#A0ABBA",
+        "roles": {
+          "link": "#60A5FA",
+          "badge_bg": "#1E2C4A",
+          "badge_text": "#38BDF8"
+        }
       },
       {
-        "name": "chat_assistant_bubble",
+        "name": "inverse",
+        "kind": "solid",
+        "bg": "#F8FAFC",
+        "on_bg": "#0B1120",
+        "on_bg_muted": "#475569"
+      },
+      {
+        "name": "hero",
+        "kind": "image",
+        "contrast_against": "#0A101D",
+        "guarantee": "scrim: linear-gradient(to right, rgba(9,13,20,0.92) 0%, rgba(9,13,20,0.78) 45%, rgba(9,13,20,0.40) 100%)",
+        "on_bg": "#FFFFFF",
+        "on_bg_muted": "#CBD5E1",
+        "roles": {
+          "link": "#60A5FA",
+          "error": "#F87171",
+          "success": "#34D399"
+        }
+      },
+      {
+        "name": "glass_header",
         "kind": "glass",
-        "contrast_against": "#0F172A",
-        "guarantee": "backdrop-blur-xl bg-slate-900/80 border border-slate-700/60 shadow-md",
+        "contrast_against": "#0B1220",
+        "guarantee": "backdrop-blur-2xl bg-[#090D14]/85 border-b border-white/10 shadow-[0_4px_30px_rgba(0,0,0,0.5)]",
         "on_bg": "#F8FAFC",
         "on_bg_muted": "#94A3B8"
       },
       {
-        "name": "badge_demo",
-        "kind": "solid",
-        "bg": "#451A03",
-        "on_bg": "#FDE68A",
-        "on_bg_muted": "#D97706"
-      },
-      {
-        "name": "badge_verified",
+        "name": "status_verified_pill",
         "kind": "solid",
         "bg": "#064E3B",
         "on_bg": "#A7F3D0",
-        "on_bg_muted": "#34D399"
+        "on_bg_muted": "#6EE7B7"
       },
       {
-        "name": "modal_overlay",
-        "kind": "glass",
-        "contrast_against": "#020617",
-        "guarantee": "backdrop-blur-xl bg-slate-950/75 border border-slate-800/90 shadow-2xl",
-        "on_bg": "#F8FAFC",
-        "on_bg_muted": "#94A3B8"
+        "name": "status_unverified_pill",
+        "kind": "solid",
+        "bg": "#78350F",
+        "on_bg": "#FDE68A",
+        "on_bg_muted": "#FCD34D"
+      },
+      {
+        "name": "status_demo_pill",
+        "kind": "solid",
+        "bg": "#451A03",
+        "on_bg": "#FED7AA",
+        "on_bg_muted": "#FDBA74"
+      }
+    ],
+    "accent": "#0066D6",
+    "on_accent": "#FFFFFF",
+    "accent_hover": "#0052B0",
+    "accent_glow": "rgba(0, 102, 214, 0.35)",
+    "commercial_accent": "#0284C7",
+    "on_commercial_accent": "#FFFFFF"
+  },
+  "typography": {
+    "font_family_heading": "Outfit Variable, sans-serif",
+    "font_family_body": "DM Sans Variable, sans-serif",
+    "font_family_mono": "Geist Mono Variable, monospace",
+    "scale_px": {
+      "display": 56,
+      "h1": 42,
+      "h2": 32,
+      "h3": 24,
+      "h4": 20,
+      "body": 16,
+      "caption": 14
+    },
+    "font_import": "@import \"@fontsource-variable/outfit\";\n@import \"@fontsource-variable/dm-sans\";\n@import \"@fontsource-variable/geist-mono\";",
+    "tracking_rules": {
+      "display": "tracking-tight",
+      "h1": "tracking-tight",
+      "h2": "tracking-tight",
+      "labels_uppercase": "tracking-[0.18em]",
+      "body": "tracking-normal",
+      "mono_data": "tracking-normal"
+    }
+  },
+  "entry_surfaces": {
+    "/": "split automotive command hero — Centrowagen official badge + key KPI metrics & live stock shortcuts on left, featured VW current vehicle hero showcase card with verified status badge on right",
+    "/login": "branded split executive portal — Centrowagen dealership identity & official VW trust panel on left, dark glassmorphism authentication form on right"
+  },
+  "visual_enhancers": {
+    "glassmorphism": "backdrop-blur-xl bg-slate-900/75 border border-white/10 shadow-2xl shadow-black/40",
+    "precision_border": "border border-slate-800/80 hover:border-blue-500/50 transition-colors duration-200",
+    "status_indicators": "Dual badge system: 🟢 VERIFICADO (con fecha de consulta oficial y fuente oficial) / 🟡 PENDIENTE DE REVISIÓN / ⚠️ NO CONFIRMADO AUTOMÁTICAMENTE (para PDFs subidos)",
+    "data_density": "Tactical tabular & bento grid cards designed for fast lookups by commercial advisors and sales managers",
+    "textures": "Subtle radial dark-glow gradients behind high-priority actions; no loud full-screen gradients"
+  },
+  "grids_and_layouts": {
+    "dashboard_bento": "grid grid-cols-1 md:grid-cols-8 lg:grid-cols-12 gap-6 p-6 md:p-8 max-w-7xl mx-auto",
+    "catalog_grid": "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6",
+    "spec_sheet_layout": "grid grid-cols-1 lg:grid-cols-12 gap-8 items-start",
+    "import_workflow_layout": "space-y-6 max-w-5xl mx-auto p-4 md:p-8",
+    "mobile_rules": "Always stack single column (`grid-cols-1`) on mobile viewports. Touch targets minimum 44px. Sticky bottom actions on mobile modal/drawer view."
+  },
+  "motion": {
+    "card_hover": "transition-transform duration-200 ease-out hover:-translate-y-1 hover:shadow-xl hover:shadow-blue-900/20",
+    "interactive_feedback": "active:scale-[0.98] transition-transform duration-100",
+    "page_transition": "animate-in fade-in-50 duration-300",
+    "stagger_delay": "staggered 50ms entrance for vehicle catalog items",
+    "prefers_reduced_motion": "Wrap custom animations with motion-reduce:transition-none"
+  },
+  "accessibility": {
+    "contrast_compliance": "WCAG AA (4.5:1 minimum on all text, 3:1 on large 24px+ headers and icons)",
+    "focus_rings": "focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950",
+    "touch_targets": "min-h-[44px] min-w-[44px] for all mobile clickable elements",
+    "test_attributes": "Every interactive and key informational element MUST include a descriptive data-testid in kebab-case"
+  },
+  "media": {
+    "image_urls": {
+      "vw_brand_emblem": {
+        "url": "https://images.unsplash.com/photo-1561517118-6068d92c6474?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDk1Nzl8MHwxfHNlYXJjaHwzfHx2b2xrc3dhZ2VuJTIwY2FyfGVufDB8fHx8MTc5MTMxMTE1Mnww&ixlib=rb-4.1.0&q=85",
+        "description": "Detalle cromado oficial del emblema Volkswagen con reflejos oscuros de alta gama",
+        "category": "branding_and_hero_headers"
+      },
+      "vw_golf_gti": {
+        "url": "https://images.unsplash.com/photo-1605475300318-c377291697ac?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDk1Nzl8MHwxfHNlYXJjaHw0fHx2b2xrc3dhZ2VuJTIwY2FyfGVufDB8fHx8MTc5MTMxMTE1Mnww&ixlib=rb-4.1.0&q=85",
+        "description": "Volkswagen Golf en garaje técnico con iluminación frontal y línea roja deportiva",
+        "category": "turismos_compactos_y_deportivos"
+      },
+      "vw_urban_executive": {
+        "url": "https://images.pexels.com/photos/5570662/pexels-photo-5570662.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+        "description": "Volkswagen negro elegante en entorno urbano contemporáneo",
+        "category": "turismos_berlina_y_suv"
+      },
+      "vw_allroad_forest": {
+        "url": "https://images.pexels.com/photos/29352868/pexels-photo-29352868.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+        "description": "Volkswagen SUV oscuro con iluminación natural y presencia robusta",
+        "category": "turismos_suv_tiguan_tayron"
+      },
+      "vw_commercial_van_lifestyle": {
+        "url": "https://images.unsplash.com/photo-1594495894542-a46cc73e081a?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA4Mzl8MHwxfHNlYXJjaHwyfHx2b2xrc3dhZ2VuJTIwdmFufGVufDB8fHx8MTc5MTMxMTE1Mnww&ixlib=rb-4.1.0&q=85",
+        "description": "Volkswagen Furgoneta en ruta montañosa evocando libertad, camper California y Transporter",
+        "category": "comerciales_life_california_multivan"
+      },
+      "vw_commercial_heritage": {
+        "url": "https://images.unsplash.com/photo-1558337249-17a4dbae9146?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA4Mzl8MHwxfHNlYXJjaHw0fHx2b2xrc3dhZ2VuJTIwdmFufGVufDB8fHx8MTc5MTMxMTE1Mnww&ixlib=rb-4.1.0&q=85",
+        "description": "Detalle frontal clásico de furgoneta Volkswagen destacando el logotipo icónico",
+        "category": "comerciales_identidad_y_legado"
+      }
+    },
+    "fallback_rules": "Si para un modelo o acabado específico de VW no se dispone de fotografía verificada en alta resolución, la interfaz DEBE mostrar una tarjeta sobria con ilustración técnica vectorial, ficha detallada y un botón destacado directo: 'Ver en configurador oficial Volkswagen España' (con enlace a https://www.volkswagen.es/es/modelos.html o https://www.volkswagen-comerciales.es/es/modelos.html)."
+  },
+  "volkswagen_lineup_structure": {
+    "turismos_passenger_cars": [
+      {
+        "family": "Eléctricos ID.",
+        "models": ["ID.3", "ID.3 GTX", "ID.4", "ID.5", "ID.7", "ID.7 GTX Tourer", "ID. Polo", "ID. Cross"],
+        "category": "turismos",
+        "propulsion": "BEV 100% Eléctrico"
+      },
+      {
+        "family": "Compactos & Berlinas",
+        "models": ["Polo", "Golf", "Golf R-Line", "Golf GTI", "Golf eHybrid", "Passat Variant", "Passat eHybrid", "Arteon"],
+        "category": "turismos",
+        "propulsion": "Gasolina / Diésel / eHybrid PHEV"
+      },
+      {
+        "family": "Gama SUV",
+        "models": ["T-Cross", "Taigo", "T-Roc", "T-Roc Cabrio", "Tiguan", "Tiguan eHybrid", "Tayron (Nuevo SUV 7 plazas)", "Touareg"],
+        "category": "turismos",
+        "propulsion": "TSI / TDI / eHybrid / 4MOTION"
+      }
+    ],
+    "vehiculos_comerciales_commercial_vehicles": [
+      {
+        "family": "Commerce (Profesional / Carga)",
+        "models": ["Caddy Cargo", "Nuevo Transporter Furgón", "e-Transporter", "Crafter Furgón L3H2", "Crafter Chasis"],
+        "category": "comerciales",
+        "propulsion": "TDI / eHybrid / 100% Eléctrico (e-Transporter)"
+      },
+      {
+        "family": "Life & Camper (Pasajeros / Ocio)",
+        "models": ["Caddy Kombi / Life", "Caddy California", "Multivan eHybrid", "Nueva Caravelle / e-Caravelle", "California eHybrid", "Grand California", "ID. Buzz", "ID. Buzz Cargo", "ID. Buzz GTX"],
+        "category": "comerciales",
+        "propulsion": "TDI / eHybrid / BEV (ID. Buzz)"
       }
     ]
   },
-  "entry_surfaces": {
-    "/": "dashboard overview with 8 status cards, system health bar, fast chat drawer, stock table snippet and demo data ribbon",
-    "/asistente": "immersive full-screen AI chat with assistant avatar banner, 11 slash command pills, prompt chips and streaming markdown output",
-    "/vehiculos": "VW catalog grid with model filter pills, electric badge indicators, price starting from, and detail modal link",
-    "/vehiculos/:id": "high-precision vehicle detail dossier with technical specs, stock availability, promo timeline, and argumentario playbook",
-    "/stock": "real-time stock management with multi-criteria filters, card/table view toggle, reservation status, and VIN tracking",
-    "/precios": "transparent pricing grid with PVP, dealer discount, financing price, and margin breakdown",
-    "/financiacion": "interactive loan & NEXT leasing simulator with slider controls, down payment, residual value, and quota calculation",
-    "/promociones": "promotions hub categorised by ACTIVA, PRÓXIMA A CADUCAR, and FINALIZADA with validity countdown badges",
-    "/comparador": "side-by-side vehicle comparison matrix supporting up to 4 VW models with difference highlighter",
-    "/documentos": "RAG document library with catalog PDFs, circulars, and technical sheets with verified source audit trails",
-    "/faq": "dealer knowledge base accordion with AI instant answers and sales argumentation links",
-    "/argumentario": "commercial objection-handling playbooks and value proposition scripts for sales reps",
-    "/memoria": "transparent AI memory & context inspector showing persistent customer & dealer preferences",
-    "/auditoria": "data verification & compliance audit tool highlighting unverified claims or stale pricing",
-    "/ventas": "seller sales register, monthly target tracker, commission calculator, and customer follow-up queue",
-    "/configuracion": "dealer settings, API sync status, seller vs client mode switch, and prompt system tuning",
-    "/login": "split branded login with Centrowagen VW Don Benito hero backdrop left, glass credentials form right"
-  },
-  "avatar_identity": {
-    "name": "SecretarIA",
-    "role": "Asistente Comercial Inteligente Volkswagen",
-    "dealership": "Centrowagen Don Benito",
-    "visual_description": "Chica pelirroja profesional con gafas modernas finas, bata blanca técnica con distintivo y bordado del logotipo circular oficial de Volkswagen en el pecho izquierdo, expresión empática, inteligente y resolutiva.",
-    "avatar_badge_style": "rounded-2xl border-2 border-cyan-400/40 shadow-[0_0_20px_rgba(0,210,255,0.25)] bg-slate-900/90 p-1 backdrop-blur-md"
-  },
-  "layout_and_navigation": {
-    "shell_type": "collapsible_sidebar_with_topbar",
-    "sidebar_sections": [
-      {"id": "inicio", "label": "Inicio", "icon": "LayoutDashboard", "path": "/"},
-      {"id": "asistente", "label": "Asistente IA", "icon": "Bot", "path": "/asistente", "badge": "IA"},
-      {"id": "vehiculos", "label": "Vehículos VW", "icon": "Car", "path": "/vehiculos"},
-      {"id": "stock", "label": "Stock en Vivo", "icon": "Warehouse", "path": "/stock"},
-      {"id": "precios", "label": "Precios & Tarifas", "icon": "Tag", "path": "/precios"},
-      {"id": "financiacion", "label": "Financiación", "icon": "Calculator", "path": "/financiacion"},
-      {"id": "promociones", "label": "Promociones", "icon": "Sparkles", "path": "/promociones"},
-      {"id": "comparador", "label": "Comparador", "icon": "Columns3", "path": "/comparador"},
-      {"id": "documentos", "label": "Documentos & RAG", "icon": "FileText", "path": "/documentos"},
-      {"id": "faq", "label": "FAQ Concesionario", "icon": "HelpCircle", "path": "/faq"},
-      {"id": "argumentario", "label": "Argumentario", "icon": "BookOpen", "path": "/argumentario"},
-      {"id": "memoria", "label": "Memoria IA", "icon": "Brain", "path": "/memoria"},
-      {"id": "auditoria", "label": "Auditoría de Datos", "icon": "ShieldCheck", "path": "/auditoria"},
-      {"id": "ventas", "label": "Ventas & Comisiones", "icon": "BadgePercent", "path": "/ventas"},
-      {"id": "configuracion", "label": "Configuración", "icon": "Settings", "path": "/configuracion"}
-    ],
-    "header_controls": [
-      {"type": "badge", "text": "DATOS DE DEMOSTRACIÓN", "variant": "amber_warning"},
-      {"type": "mode_switch", "label": "Modo Vendedor / Modo Cliente", "test_id": "mode-toggle-switch"},
-      {"type": "sync_indicator", "label": "Sincronizado: Hoy, 10:45", "icon": "RefreshCw"},
-      {"type": "user_profile", "name": "Vendedor Comercial", "role": "Centrowagen Don Benito"}
-    ]
-  },
-  "slash_commands": [
-    {"command": "/stock", "description": "Consultar unidades disponibles en Don Benito o red"},
-    {"command": "/precio", "description": "Consultar PVP, descuentos de campaña y cuota"},
-    {"command": "/financiacion", "description": "Calcular simulación Volkswagen My Way o Renting"},
-    {"command": "/promociones", "description": "Ver ofertas activas del mes en curso"},
-    {"command": "/comparar", "description": "Comparar 2 a 4 modelos (ej: Golf vs T-Roc)"},
-    {"command": "/vehiculo", "description": "Ficha técnica completa y equipamiento de serie"},
-    {"command": "/faq", "description": "Respuestas a dudas comerciales y garantías"},
-    {"command": "/cliente", "description": "Generar mensaje persuasivo de WhatsApp o Email"},
-    {"command": "/auditar", "description": "Verificar procedencia y fecha de los datos"},
-    {"command": "/investigar", "description": "Buscar en documentación oficial y circulares"},
-    {"command": "/memoria", "description": "Inspeccionar preferencias guardadas del cliente"}
-  ],
-  "components_structure": {
-    "dashboard_cards": [
-      {"id": "card_vehiculos", "title": "Catálogo Gama VW", "metric": "24 Modelos", "sub": "ID. Family, SUV, Compactos"},
-      {"id": "card_stock", "title": "Stock Disponible", "metric": "38 Unidades", "sub": "14 Entrega Inmediata"},
-      {"id": "card_precios", "title": "Tarifas Actualizadas", "metric": "Vigentes 2026", "sub": "Campaña Centrowagen Q3"},
-      {"id": "card_financiacion", "title": "Planes MyWay", "metric": "Desde 180€/mes", "sub": "TIN 6,95% / TAE 8,12%"},
-      {"id": "card_promociones", "title": "Promociones Activas", "metric": "6 Campañas", "sub": "2 Próximas a caducar"},
-      {"id": "card_documentos", "title": "Base Documental RAG", "metric": "142 PDFs", "sub": "Manuales y fichas técnicas"},
-      {"id": "card_memoria", "title": "Entidades en Memoria", "metric": "85 Clientes", "sub": "Contexto activo sincronizado"},
-      {"id": "card_faq", "title": "Base de Conocimiento", "metric": "56 Respuestas", "sub": "Homologadas por jefatura"}
-    ],
-    "client_generator": {
-      "channels": ["WhatsApp", "Email Formal", "Propuesta PDF Rápida"],
-      "tones": ["Entusiasta", "Profesional / Asesor", "Urgente / Últimos Días"],
-      "features": ["Cálculo automático de cuota", "Enlace a ficha", "Botón copiar con 1 click"]
+  "data_verification_and_demo_cleaning_protocol": {
+    "demo_data_purge_guidelines": {
+      "target_records": "Eliminar de forma selectiva todos los registros de demostración que lleven el prefijo de prueba o bandera demo (ej. 'CB-DEMO', stocks ficticios antiguos no contrastados, ofertas ficticias caducadas), preservando íntegramente la configuración del concesionario, usuarios registrados, historial de roles y conexiones.",
+      "audit_mode": "Cada vehículo o versión debe contener metadatos transparentes: 'fuente' (Catálogo Oficial VW España / Importación Excel Tarifa Oficial), 'fecha_consulta' (formato DD/MM/AAAA) y 'estado_verificacion' (VERIFICADO / PENDIENTE / MANUAL)."
+    },
+    "excel_csv_import_workflow": {
+      "step_1_upload": "Carga de archivo drag-and-drop con soporte para archivos .xlsx, .xls y .csv. Reconocimiento flexible de columnas (Modelo, Versión/Acabado, Motorización, Potencia CV/kW, PVP Oficial, PVP Concesionario, Campaña Promocional, Stock, Número Bastidor CB).",
+      "step_2_preview_matrix": "Vista previa interactiva en tabla densa con desglose de filas detectadas: 'Nuevas versiones a añadir' (badge verde), 'Actualizaciones de tarifa/stock existente' (badge azul con diferencial de precio +X€ / -X€), y 'Filas no reconocidas o dudosas' (badge amarillo de advertencia).",
+      "step_3_confirmation_modal": "Modal de confirmación explícito con resumen de cambios antes de escribir en base de datos. Opción de actualizar simultáneamente PVP en catálogo general y en unidades de stock vinculadas.",
+      "step_4_rollback_or_audit_log": "Registro inmutable en el historial de auditoría indicando fecha, usuario que realizó la importación y número de registros modificados."
+    },
+    "pdf_document_source_treatment": {
+      "unverified_notice": "Los documentos PDF adjuntados o subidos (catálogos de fábrica, listas de precios en PDF, circulares comerciales) se almacenan como biblioteca documental de consulta y contexto para la IA RAG, pero sus datos NO se marcan automáticamente como verificados en el motor transaccional hasta ser contrastados o confirmados expresamente por el administrador comercial.",
+      "ui_badge_for_pdf_sources": "Badge 'Fuente: Documento PDF (No verificado automáticamente)' con icono de alerta suave."
     }
-  },
-  "image_urls": [
-    {
-      "category": "hero_brand",
-      "url": "https://images.unsplash.com/photo-1605152277138-359efd4a6862?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDk1ODF8MHwxfHNlYXJjaHwzfHx2b2xrc3dhZ2VuJTIwY2FyJTIwbW9kZXJufGVufDB8fHx8MTc4MzEwODk4M3ww&ixlib=rb-4.1.0&q=85",
-      "description": "Logotipo iluminado Volkswagen azul y blanco sobre fachada nocturna del concesionario"
-    },
-    {
-      "category": "vehicle_showcase_golf",
-      "url": "https://images.unsplash.com/photo-1605475300127-0a31e8273bc2?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDk1ODF8MHwxfHNlYXJjaHwxfHx2b2xrc3dhZ2VuJTIwY2FyJTIwbW9kZXJufGVufDB8fHx8MTc4MzEwODk4M3ww&ixlib=rb-4.1.0&q=85",
-      "description": "Volkswagen Golf GTI frontal blanco en estudio fotográfico con ópticas LED IQ.Light"
-    },
-    {
-      "category": "vehicle_showcase_electric",
-      "url": "https://images.unsplash.com/photo-1704340142770-b52988e5b6eb?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA1MDZ8MHwxfHNlYXJjaHwyfHxtb2Rlcm4lMjBlbGVjdHJpYyUyMGNhciUyMHN0dWRpb3xlbnwwfHx8fDE3OTEyMDgxNjZ8MA&ixlib=rb-4.1.0&q=85",
-      "description": "Vehículo eléctrico aerodinámico Volkswagen ID.7 en estudio de diseño oscuro"
-    },
-    {
-      "category": "vehicle_interior_tech",
-      "url": "https://images.unsplash.com/photo-1617886322009-e02db73a70ee?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA1MDZ8MHwxfHNlYXJjaHwxfHxtb2Rlcm4lMjBlbGVjdHJpYyUyMGNhciUyMHN0dWRpb3xlbnwwfHx8fDE3OTEyMDgxNjZ8MA&ixlib=rb-4.1.0&q=85",
-      "description": "Cockpit digital y volante multifunción Volkswagen con acabado premium"
-    }
-  ],
-  "visual_enhancers": {
-    "glass_blur_token": "backdrop-blur-xl bg-slate-900/60 border border-slate-700/50 shadow-[0_8px_32px_rgba(0,0,0,0.4)]",
-    "electric_glow": "box-shadow: 0 0 25px rgba(0, 102, 214, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.1)",
-    "strict_data_transparency_pill": "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-mono font-medium bg-slate-800/80 text-cyan-300 border border-cyan-500/30",
-    "demo_pill": "inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold tracking-wider uppercase bg-amber-500/20 text-amber-300 border border-amber-500/40"
-  },
-  "motion": {
-    "transition_defaults": "transition-colors duration-200 ease-out, transition-opacity duration-200 ease-out, transition-shadow duration-200 ease-out",
-    "chat_streaming_pulse": "animate-pulse text-cyan-400 font-medium",
-    "card_hover": "hover:border-cyan-500/40 hover:bg-slate-800/60 hover:-translate-y-0.5 transition-all duration-200",
-    "respect_reduced_motion": "@media (prefers-reduced-motion: reduce) { * { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; } }"
-  },
-  "accessibility": {
-    "wcag_level": "WCAG 2.1 AA Compliant",
-    "apca_target": "Normal text >= 60 Lc, Large text >= 45 Lc",
-    "focus_rings": "focus-visible:ring-2 focus-visible:ring-cyan-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 focus-visible:outline-none",
-    "data_testid_convention": "kebab-case semantic identifiers on all interactive elements (e.g. data-testid='chat-input-textarea', data-testid='stock-filter-fuel-select', data-testid='compare-add-vehicle-btn')"
   },
   "instructions_to_main_agent": [
-    "1. Configura la estética 'Liquid Glass' oscura con Tailwind v4 usando Inter como tipografía y azul Volkswagen (#0066D6) como acento de interacción.",
-    "2. Implementa la barra lateral con las 14 secciones completas más la sección de 'Ventas y Comisiones' del comercial.",
-    "3. Añade la identidad visual del avatar de SecretarIA: una chica pelirroja con gafas modernas y bata blanca con el logo circular oficial de Volkswagen.",
-    "4. El chat debe soportar respuestas en streaming estructuradas (tarjetas con precios, cuotas, equipamiento, botones de acción rápida, etiquetas de verificación).",
-    "5. Añade siempre la etiqueta 'DATOS DE DEMOSTRACIÓN' visible y el principio de no inventar datos (mostrando fuente, fecha de actualización y estado de verificación en cada dato comercial).",
-    "6. Incorpora los 11 comandos slash (/stock, /precio, /financiacion, /promociones, /comparar, /vehiculo, /faq, /cliente, /auditar, /investigar, /memoria) accesibles mediante menú rápido y pills clicables.",
-    "7. Construye el comparador interactivo hasta 4 vehículos con matriz de diferencias y recomendación de venta.",
-    "8. Incluye el generador de mensajes para clientes (WhatsApp / Email / Oferta) con personalización de tono y cálculo de cuota mensual.",
-    "9. Soporta el interruptor 'Modo Vendedor' (muestra márgenes, comisiones y argumentos confidenciales) vs 'Modo Cliente' (diseño limpio y precios finales para mostrar en pantalla frente al cliente).",
-    "10. Asegura que todos los botones, selectores, inputs y tablas lleven su atributo 'data-testid' correspondiente."
+    "1. MANTENER LA ESTRUCTURA Y NAVEGACIÓN EXISTENTE: Respetar las rutas de /app/frontend/src/App.tsx y la arquitectura de componentes. No rehacer desde cero lo que ya funciona; potenciar las áreas solicitadas.",
+    "2. TURISMOS Y COMERCIALES: Incorporar en el catálogo y filtros la distinción clara entre Turismos (Gama ID., Compactos, Berlinas, SUVs) y Volkswagen Vehículos Comerciales (Caddy, Transporter, Caravelle, Multivan, California, Crafter, ID. Buzz) con sus especificaciones técnicas de procedencia oficial.",
+    "3. IMÁGENES Y ENLACES OFICIALES: Utilizar las URLs de imágenes seleccionadas para los modelos principales y asegurar que cada tarjeta y ficha incluya el enlace oficial de verificación a volkswagen.es o volkswagen-comerciales.es si faltan fotos de detalle.",
+    "4. LIMPIEZA DE DATOS DEMO: Proporcionar script o acción de interfaz para purgar registros estrictamente demo conservando usuarios y configuración de Centrowagen Don Benito.",
+    "5. FLUJO DE IMPORTACIÓN EXCEL/CSV: Garantizar que la página /importar tenga una experiencia impecable: subida, previsualización detallada con deltas de precio, advertencias de filas dudosas y confirmación antes de aplicar a la base de datos.",
+    "6. TRATAMIENTO DE PDFs: En la sección /documentos y fichas de vehículos, etiquetar claramente los PDFs como fuentes documentales complementarias sin auto-verificación automática.",
+    "7. ESTILO Y FORMATO: Respetar la localización española (moneda €, separador de miles con punto y decimales con coma, fechas DD/MM/AAAA) y modo oscuro elegante (#090D14 / #0F172A / #0066D6). Añadir 'data-testid' en todos los elementos interactivos."
+  ],
+  "universal_guidelines_for_main_agent": [
+    "Avoid AI slop: Use high-contrast dark tones, tactile 1px borders, subtle glassmorphism, and crystal-clear data hierarchy.",
+    "Typography: Use Outfit for bold automotive headlines, DM Sans for high-legibility body, and Geist Mono for prices, VINs and technical data.",
+    "Never use generic centered layouts for data-heavy dealership tools.",
+    "Always provide immediate visual feedback (toast notifications via sonner, loading skeletons, state indicators).",
+    "Ensure all buttons and inputs have accessible touch targets (minimum 44px on mobile) and clear hover/focus states with data-testid attributes."
   ]
 }

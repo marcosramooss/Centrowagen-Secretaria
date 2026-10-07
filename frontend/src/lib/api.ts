@@ -63,6 +63,8 @@ export interface StreamEvent {
   content?: string;
   chat_id?: string;
   sources?: SourceRef[];
+  engine?: string;
+  external_help?: boolean;
 }
 
 export async function apiStream(

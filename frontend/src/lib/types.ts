@@ -8,6 +8,7 @@ export interface Dimensions {
 }
 
 export interface Vehicle {
+  verification_status: string;
   id: string;
   brand: string;
   model: string;
@@ -36,6 +37,8 @@ export interface Vehicle {
 }
 
 export interface StockUnit {
+  verification_status: string;
+  source: string;
   id: string;
   vehicle_id: string;
   stock_number: string;
@@ -58,6 +61,7 @@ export interface StockUnit {
 }
 
 export interface PriceEntry {
+  verification_status: string;
   id: string;
   vehicle_id: string;
   base_price: number;
@@ -109,6 +113,7 @@ export interface Promotion {
 }
 
 export interface DocumentItem {
+  verification_status: string;
   id: string;
   name: string;
   category: string;
@@ -179,6 +184,7 @@ export interface SourceRef {
   name: string;
   updated: string;
   estado: string;
+  url?: string | null;
 }
 
 export interface ChatMeta {
@@ -195,6 +201,15 @@ export interface ChatMsg {
   content: string;
   sources: SourceRef[];
   created_at: string;
+  engine: string;
+  external_help: boolean;
+}
+
+export interface LocalAnswer {
+  content: string;
+  sources: SourceRef[];
+  external_help: boolean;
+  engine: string;
 }
 
 export interface Sale {

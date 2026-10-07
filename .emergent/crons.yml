@@ -1,4 +1,12 @@
 crons:
+  - name: catalogo-vw-diario
+    description: "Actualiza modelos y fotografías oficiales de Volkswagen España cada día a las 08:00"
+    cron: "0 8 * * *"
+    timezone: "Europe/Madrid"
+    # Cron endpoints must ack 2xx immediately; enqueue/background the actual work.
+    endpoint: "{{BASE_URL}}/api/cron/catalog-sync"
+    method: POST
+    enabled: true
   - name: tareas-diarias
     description: "Envia a cada vendedor el resumen por email de sus tareas vencidas y de hoy"
     cron: "0 8 * * *"

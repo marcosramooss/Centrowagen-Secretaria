@@ -28,6 +28,8 @@ from routers.tariff import router as tariff_router
 from routers.offers import router as offers_router
 from routers.ai import router as ai_router
 from routers.dataimport import router as dataimport_router
+from routers.catalog import router as catalog_router
+from routers.intake import router as intake_router
 
 
 # Startup runs before the yield, shutdown after it. Add your own setup/teardown here.
@@ -56,14 +58,13 @@ api_router = APIRouter(prefix="/api")
 
 @api_router.get("/")
 async def root():
-    return {"app": "SecretarIA", "message": "Asistente comercial Volkswagen — Centrowagen Don Benito", "demo": True}
+    return {"app": "SecretarIA", "message": "Asistente comercial Volkswagen — Centrowagen Don Benito", "demo": False}
 
 
-for _router in (auth_router, dealer_router, knowledge_router, chat_router, client_message_router, client_messages_router, sales_router, audit_router, stats_router, tasks_router, tariff_router, offers_router, ai_router, dataimport_router):
+for _router in (auth_router, dealer_router, knowledge_router, chat_router, client_message_router, client_messages_router, sales_router, audit_router, stats_router, tasks_router, tariff_router, offers_router, ai_router, dataimport_router, catalog_router, intake_router):
     api_router.include_router(_router)
 
 # Include the router in the main app — keep this the last routing statement
-app.include_router(api_router)
 
 app.add_middleware(
     CORSMiddleware,
@@ -79,3 +80,5 @@ logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 )
 logger = logging.getLogger(__name__)
+
+app.include_router(api_router)

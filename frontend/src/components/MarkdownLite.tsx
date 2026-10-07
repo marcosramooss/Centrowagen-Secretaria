@@ -17,7 +17,7 @@ function isSep(row: string): boolean {
 }
 
 // Lightweight markdown renderer for SecretarIA's answers (headings, bold, lists, tables).
-export default function MarkdownLite({ content }: { content: string }) {
+export default function MarkdownLite({ content, testId = "ai-response-content" }: { content: string; testId?: string }) {
   const out: ReactNode[] = [];
   const lines = content.split("\n");
   let i = 0;
@@ -37,7 +37,7 @@ export default function MarkdownLite({ content }: { content: string }) {
         i++;
       }
       out.push(
-        <div key={key++} className="my-3 overflow-x-auto rounded-lg border border-slate-700/60" data-testid="ai-response-table">
+        <div key={key++} className="my-3 overflow-x-auto rounded-lg border border-slate-700/60" data-testid={`${testId}-table-${key}`}>
           <table className="w-full text-sm">
             {rows[0] && (
               <thead>
@@ -133,7 +133,7 @@ export default function MarkdownLite({ content }: { content: string }) {
   }
 
   return (
-    <div className="text-[15px]" data-testid="ai-response-content">
+    <div className="text-[15px]" data-testid={testId}>
       {out}
     </div>
   );

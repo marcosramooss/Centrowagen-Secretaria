@@ -19,7 +19,7 @@ const STATUS_STYLES: Record<TariffRow["status"], { label: string; cls: string }>
   no_reconocida: { label: "No reconocida", cls: "border-rose-500/40 bg-rose-500/15 text-rose-300" },
 };
 
-export default function ImportarTarifas() {
+export default function ImportarTarifas({ embedded = false }: { embedded?: boolean }) {
   const qc = useQueryClient();
   const { data: me } = useMe();
   const isAdmin = me?.role === "admin";
@@ -58,11 +58,11 @@ export default function ImportarTarifas() {
 
   return (
     <div data-testid="importar-page">
-      <PageHeader
-        title="⬆️ Importar tarifa oficial"
+      {!embedded && <PageHeader
+        title="Importar tarifas"
         subtitle="Sube el Excel o CSV de tarifas: emparejo por modelo y acabado, te muestro el resumen y solo escribo cuando confirmas."
         right={<DemoPill />}
-      />
+      />}
 
       {!isAdmin && (
         <div className="mb-5 rounded-2xl border border-amber-500/30 bg-amber-500/10 p-4 text-sm text-amber-200" data-testid="importar-no-admin">
@@ -91,11 +91,14 @@ export default function ImportarTarifas() {
             <Input
               ref={fileRef}
               type="file"
-              accept=".xlsx,.xlsm,.xls,.csv"
+              accept=".xlsx,.xlsm,.csv"
+              onChange={() => { setPreview(null); setResult(null); }}
               disabled={!isAdmin}
               className="file:mr-3 file:rounded-md file:border-0 file:bg-sky-600/30 file:px-3 file:py-1 file:text-xs file:text-sky-200"
               data-testid="tariff-file-input"
             />
+
+      <p className="mb-5 text-sm text-amber-200" data-testid="tariff-verification-notice">La importación registra tu archivo; no acredita su carácter oficial. Contrasta importes y vigencia antes de ofrecerlos a clientes. Los registros quedan pendientes de verificación.</p>
           </div>
           <div className="space-y-1.5">
             <Label className="text-xs">Fuente que se registrará</Label>

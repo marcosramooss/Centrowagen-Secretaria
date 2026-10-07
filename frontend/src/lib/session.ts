@@ -11,7 +11,8 @@ export function useMe() {
     queryKey: ["me"],
     queryFn: () => apiGet<User>("/auth/me"),
     retry: false,
-    staleTime: Infinity,
+    staleTime: 30000,
+    refetchOnWindowFocus: 'always',
   });
 }
 

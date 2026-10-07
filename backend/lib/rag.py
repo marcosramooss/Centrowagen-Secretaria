@@ -79,14 +79,14 @@ async def retrieve(query: str) -> dict:
         "faq": [], "memory": [], "documents": [], "argumentario": [],
     }
 
-    vehicles = await db.vehicles.find({"active": True}).to_list(500)
-    stock = await db.stock.find().to_list(2000)
-    prices = await db.prices.find().to_list(2000)
+    vehicles = await db.vehicles.find({"active": True, "verification_status": {"$ne": "pending"}}).to_list(500)
+    stock = await db.stock.find({"verification_status": {"$ne": "pending"}}).to_list(2000)
+    prices = await db.prices.find({"verification_status": {"$ne": "pending"}}).to_list(2000)
     financing = await db.financing.find().to_list(500)
     promotions = await db.promotions.find().to_list(500)
     faq = await db.faq.find().to_list(500)
     memory = await db.memory.find().to_list(500)
-    documents = await db.documents.find({"active": True, "is_deleted": {"$ne": True}}).to_list(500)
+    documents = await db.documents.find({"active": True, "is_deleted": {"$ne": True}, "verification_status": "verified"}).to_list(500)
     argumentario = await db.argumentario.find().to_list(200)
 
     # Vehicles — top matches by name/trim/fuel/body; fall back to the whole range.
@@ -290,14 +290,7 @@ FORMATO DE RESPUESTA:
 - Markdown sencillo: títulos con ##, negritas con **, listas con -, tablas con | para comparativas.
 - Respuesta rápida, clara, profesional y comercial. No más de una pantalla salvo que te lo pidan.
 - Destaca precios y cuotas en negrita. Muestra estado (🟢/🟡), fecha de actualización y fuente cuando corresponda.
-- Ejemplo de bloque de respuesta para un modelo:
-
-## Volkswagen T-Roc
-**R-Line 1.5 TSI DSG**
-🚗 150 CV · ⚙️ DSG · ⛽ Gasolina · 💰 **35.020 €** · 📦 **Stock disponible**
-
-**Promoción** 🔥 ... · **Financiación** desde **XXX €/mes** · ⚠️ Condiciones sujetas a campaña vigente.
-📚 Fuente: ... · 📅 Actualizado: ... · 🟢/🟡
+- No uses documentos pendientes de verificación ni ejemplos de demostración como evidencia comercial.
 
 === DATOS RECUPERADOS DE LA BASE DE DATOS (única fuente permitida) ===
 {build_context_block(context)}

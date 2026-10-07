@@ -182,7 +182,7 @@ export default function Comparador() {
       )}
 
       <p className="mt-4 text-xs text-muted-foreground">
-        ⚠️ DATOS DE DEMOSTRACIÓN. Las diferencias resaltadas son orientativas y no sustituyen la ficha técnica oficial.
+        Las diferencias resaltadas no sustituyen la ficha técnica oficial. Contrasta las versiones pendientes de verificación.
       </p>
     </div>
   );

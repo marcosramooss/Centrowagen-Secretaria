@@ -20,10 +20,10 @@ class Vehicle(BaseModel):
     brand: str = "Volkswagen"
     model: str
     generation: str | None = None
-    body_type: str = "SUV"
+    body_type: str = "No confirmado"
     trim: str = ""
     engine: str | None = None
-    fuel: str = "Gasolina"
+    fuel: str = "No confirmado"
     hybrid_type: str | None = None
     power_cv: int | None = None
     transmission: str | None = None
@@ -40,16 +40,17 @@ class Vehicle(BaseModel):
     active: bool = True
     source: str = "Tarifa Volkswagen"
     source_url: str | None = None
+    verification_status: str = 'pending'
     last_updated: datetime = Field(default_factory=now_utc)
 
 
 class VehicleIn(BaseModel):
     model: str
     generation: str | None = None
-    body_type: str = "SUV"
+    body_type: str = "No confirmado"
     trim: str = ""
     engine: str | None = None
-    fuel: str = "Gasolina"
+    fuel: str = "No confirmado"
     hybrid_type: str | None = None
     power_cv: int | None = None
     transmission: str | None = None
@@ -68,6 +69,8 @@ class VehicleIn(BaseModel):
 
 
 class StockUnit(BaseModel):
+    verification_status: str = 'pending'
+    source: str = 'Registro del concesionario'
     id: str = Field(default_factory=new_id)
     vehicle_id: str
     stock_number: str
@@ -83,7 +86,7 @@ class StockUnit(BaseModel):
     pvp: float | None = None
     promotional_price: float | None = None
     financing_price: float | None = None
-    availability: str = "Bajo pedido"  # Entrega inmediata | En tránsito | Bajo pedido | Reservado
+    availability: str = "No confirmado"
     location: str = "Don Benito"
     delivery_estimate: str | None = None
     last_updated: datetime = Field(default_factory=now_utc)
@@ -104,12 +107,13 @@ class StockIn(BaseModel):
     pvp: float | None = None
     promotional_price: float | None = None
     financing_price: float | None = None
-    availability: str = "Bajo pedido"
+    availability: str = "No confirmado"
     location: str = "Don Benito"
     delivery_estimate: str | None = None
 
 
 class PriceEntry(BaseModel):
+    verification_status: str = 'pending'
     id: str = Field(default_factory=new_id)
     vehicle_id: str
     base_price: float

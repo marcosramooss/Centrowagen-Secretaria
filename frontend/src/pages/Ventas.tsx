@@ -293,7 +293,7 @@ export default function Ventas() {
       )}
 
       <p className="mt-4 text-xs text-muted-foreground">
-        ⚠️ La comisión mostrada es una ESTIMACIÓN con DATOS DE DEMOSTRACIÓN. La liquidación real la determina la
+        La comisión mostrada es una estimación según la configuración del concesionario. La liquidación real la determina la
         dirección del concesionario.
       </p>
     </div>

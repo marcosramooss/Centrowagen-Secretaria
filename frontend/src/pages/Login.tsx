@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 
 import SecretariaAvatar from "@/components/SecretariaAvatar";
@@ -8,15 +8,25 @@ import { DemoPill } from "@/components/bits";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { ApiError, apiPost } from "@/lib/api";
+import { ApiError, apiPost, apiGet } from "@/lib/api";
+import type { SetupStatus, SetupIn } from "@/lib/catalog";
 import { beginSession, useMe } from "@/lib/session";
 import type { User } from "@/lib/types";
 
 export default function Login() {
   const navigate = useNavigate();
   const { data: me } = useMe();
-  const [email, setEmail] = useState("vendedor@centrowagen.es");
-  const [password, setPassword] = useState("vendedor123");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [name, setName] = useState("");
+  const [setupToken, setSetupToken] = useState("");
+  const status = useQuery({ queryKey: ["setup-status"], queryFn: () => apiGet<SetupStatus>("/auth/setup"), retry: false });
+  const setupRequired = status.data?.required === true;
+  const setup = useMutation({
+    mutationFn: (body: SetupIn) => apiPost<User>("/auth/setup", body),
+    onSuccess: () => { beginSession(); toast.success("Administrador configurado"); navigate("/vehiculos", { replace: true }); },
+    onError: (e) => { const detail = e instanceof ApiError ? (e.body as { detail?: unknown })?.detail : null; toast.error(typeof detail === "string" ? detail : "No se pudo configurar el acceso"); },
+  });
 
   const login = useMutation({
     mutationFn: (body: { email: string; password: string }) => apiPost<User>("/auth/login", body),
@@ -60,8 +70,7 @@ export default function Login() {
             </h1>
             <p className="mt-4 text-[15px] leading-relaxed text-slate-300">
               Catálogo, stock, tarifas, financiación, promociones y argumentario — en un único panel,
-              con una IA que responde solo con la información oficial disponible y nunca inventa datos
-              comerciales.
+              con trazabilidad de las fuentes y sin completar con suposiciones los datos que faltan.
             </p>
             <div className="mt-6 flex flex-wrap gap-2 text-xs text-slate-400">
               {["🚗 Catálogo", "📦 Stock", "💰 Precios", "💳 Financiación", "🔥 Promociones", "📊 Comparador"].map((t) => (
@@ -86,17 +95,20 @@ export default function Login() {
             </div>
           </div>
 
-          <h2 className="text-2xl font-bold tracking-tight text-white">Acceso al panel</h2>
-          <p className="mt-1 text-sm text-muted-foreground">Identifícate para acceder a la información comercial.</p>
+          <h2 className="text-2xl font-bold tracking-tight text-white" data-testid="login-title">{setupRequired ? "Configura tu concesionario" : "Acceso al panel"}</h2>
+          <p className="mt-1 text-sm text-muted-foreground" data-testid="login-description">{setupRequired ? "Crea el primer administrador con tu código privado de instalación. Sin datos de demostración." : "Identifícate para acceder a la información comercial."}</p>
+          {status.isError && <p className="mt-3 text-sm text-amber-300" data-testid="login-connection-error">No se pudo comprobar la configuración. Revisa la conexión con el servidor.</p>}
 
           <form
             className="mt-7 space-y-4"
             onSubmit={(e) => {
               e.preventDefault();
-              login.mutate({ email, password });
+              if (setupRequired) setup.mutate({ name, email, password, setup_token: setupToken });
+              else login.mutate({ email, password });
             }}
             data-testid="login-form"
           >
+            {setupRequired && <><div className="space-y-1.5"><Label htmlFor="setup-name" data-testid="setup-name-label">Tu nombre</Label><Input id="setup-name" required minLength={2} value={name} onChange={e => setName(e.target.value)} data-testid="setup-name-input" /></div><div className="space-y-1.5"><Label htmlFor="setup-code" data-testid="setup-code-label">Código privado de instalación</Label><Input id="setup-code" type="password" required autoComplete="off" value={setupToken} onChange={e => setSetupToken(e.target.value)} data-testid="setup-code-input" /></div></>}
             <div className="space-y-1.5">
               <Label htmlFor="email">Correo electrónico</Label>
               <Input
@@ -114,15 +126,18 @@ export default function Login() {
               <Input
                 id="password"
                 type="password"
-                autoComplete="current-password"
+                autoComplete={setupRequired ? "new-password" : "current-password"}
+                minLength={setupRequired ? 5 : undefined}
+                maxLength={setupRequired ? 128 : undefined}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
                 data-testid="login-password-input"
               />
             </div>
-            <Button type="submit" className="w-full glow-accent" disabled={login.isPending} data-testid="login-form-submit-button">
-              {login.isPending ? "Accediendo…" : "Entrar"}
+            {setupRequired && <p className="text-xs text-slate-400" data-testid="setup-password-help">Elige una contraseña de al menos 5 caracteres. La configuración se cierra al crear el primer administrador.</p>}
+            <Button type="submit" className="w-full glow-accent" disabled={login.isPending || setup.isPending || status.isPending || status.isError} data-testid="login-form-submit-button">
+              {login.isPending || setup.isPending ? "Guardando…" : setupRequired ? "Crear administrador" : "Entrar"}
             </Button>
           </form>
 
@@ -138,6 +153,7 @@ export default function Login() {
             className="w-full gap-2"
             onClick={googleSignIn}
             data-testid="login-google-button"
+            disabled={setupRequired}
           >
             <svg viewBox="0 0 24 24" className="h-4 w-4" aria-hidden>
               <path fill="#4285F4" d="M23.5 12.3c0-.8-.1-1.6-.2-2.3H12v4.5h6.4a5.5 5.5 0 0 1-2.4 3.6v3h3.9c2.3-2.1 3.6-5.2 3.6-8.8Z" />
@@ -148,13 +164,7 @@ export default function Login() {
             Continuar con Google
           </Button>
 
-          <div className="mt-7 rounded-xl border border-slate-700/60 bg-slate-900/50 p-3.5" data-testid="login-demo-accounts">
-            <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Cuentas de demostración</p>
-            <div className="mt-2 space-y-1 font-mono text-[11px] text-slate-300">
-              <p>doncipotecheats@gmail.com · admin123 <span className="text-sky-400">(ADMIN)</span></p>
-              <p>vendedor@centrowagen.es · vendedor123 <span className="text-slate-500">(VENDEDOR)</span></p>
-            </div>
-          </div>
+          <p className="mt-6 text-xs leading-5 text-slate-500" data-testid="login-access-note">Acceso restringido al equipo autorizado. IA y correo requieren recuperar su configuración antes de utilizarlos.</p>
         </div>
       </div>
     </div>

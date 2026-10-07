@@ -1,6 +1,7 @@
-"""SecretarIA chat — SSE streaming with RAG over the dealer database."""
+"""Local evidence lookup over the dealership database, delivered using SSE; no LLM calls."""
 
 import json
+import logging
 
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import StreamingResponse
@@ -8,8 +9,8 @@ from fastapi.responses import StreamingResponse
 from lib.auth import get_current_user
 from lib.db import db
 from lib.doc import new_id, now_utc, prepare
-from lib.llm import model_label, stream_completion
-from lib.rag import build_system_prompt, context_sources, retrieve
+from lib.local_assistant import answer_local
+from models.local_chat import LocalAnswer
 from models.chat import ChatMeta, ChatMsg, ChatSend
 
 router = APIRouter(tags=["chat"])
@@ -21,8 +22,15 @@ def _sse(payload: dict) -> str:
 
 @router.post("/chat")
 async def chat(payload: ChatSend, user: dict = Depends(get_current_user)):
+    if not payload.message.strip():
+        raise HTTPException(422, 'Escribe una consulta')
     chat_id = payload.chat_id or new_id()
     now = now_utc()
+    if payload.chat_id:
+        existing = await db.chats.find_one({'id': chat_id, 'user_id': user['id']})
+        if not existing:
+            raise HTTPException(404, 'Conversación no encontrada')
+    previous = await db.messages.find_one({'chat_id': chat_id, 'role': 'user'}, sort=[('created_at', -1)])
     if not payload.chat_id:
         await db.chats.insert_one(
             {
@@ -44,41 +52,18 @@ async def chat(payload: ChatSend, user: dict = Depends(get_current_user)):
         }
     )
 
-    context = await retrieve(payload.message)
-    sources = context_sources(context)
-    stripped = payload.message.strip()
-    command = stripped.split(" ", 1)[0] if stripped.startswith("/") else None
-    system = build_system_prompt(payload.mode, context, command=command, user_name=user.get("name", ""))
-
-    history_docs = await db.messages.find({"chat_id": chat_id}).sort("created_at", -1).to_list(9)
-    history_docs = list(reversed(history_docs))[:-1]  # exclude the message stored just above
-    history_block = "\n".join(
-        f"{'Vendedor' if m.get('role') == 'user' else 'SecretarIA'}: {str(m.get('content', ''))[:500]}"
-        for m in history_docs
-    )
-    user_text = (
-        f"Conversación previa:\n{history_block}\n\nPregunta actual: {payload.message}"
-        if history_block
-        else payload.message
-    )
+    try:
+        answer = await answer_local(payload.message, payload.mode, (previous or {}).get('content', ''))
+    except Exception:
+        logging.getLogger(__name__).exception('Local lookup failed')
+        answer = LocalAnswer(content='No se pudo consultar la información local. Inténtalo de nuevo o abre las secciones del panel. No se ha llamado a ningún servicio de IA.', external_help=True)
+    sources = [s.model_dump() for s in answer.sources]
 
     async def gen():
-        yield _sse({"type": "meta", "chat_id": chat_id, "sources": sources, "engine": model_label(payload.model)})
-        chunks: list[str] = []
-        try:
-            async for delta in stream_completion(
-                system, user_text, session_id=f"secretaria-{new_id()}", model_key=payload.model
-            ):
-                chunks.append(delta)
-                yield _sse({"type": "delta", "content": delta})
-        except Exception as exc:  # never strand the UI without a close event
-            yield _sse(
-                {
-                    "type": "delta",
-                    "content": f"\n\n⚠️ No he podido completar la respuesta ({exc}). Inténtalo de nuevo o consulta los datos en las secciones del panel.",
-                }
-            )
-        content = "".join(chunks)
+        yield _sse({"type": "meta", "chat_id": chat_id, "sources": sources, "engine": answer.engine, 'external_help': answer.external_help})
+        content = answer.content
+        for start in range(0, len(content), 240):
+            yield _sse({'type': 'delta', 'content': content[start:start + 240]})
         await db.messages.insert_one(
             {
                 "id": new_id(),
@@ -87,6 +72,8 @@ async def chat(payload: ChatSend, user: dict = Depends(get_current_user)):
                 "content": content,
                 "sources": sources,
                 "created_at": now_utc(),
+                'engine': answer.engine,
+                'external_help': answer.external_help,
             }
         )
         await db.chats.update_one({"id": chat_id}, {"$set": {"updated_at": now_utc()}})

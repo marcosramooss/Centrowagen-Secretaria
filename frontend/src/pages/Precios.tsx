@@ -81,6 +81,7 @@ export default function Precios() {
                     <div className="flex flex-col gap-0.5">
                       <span>📚 {p.source}</span>
                       <span>📅 {fmtDate(p.last_updated)}</span>
+                      <span className="text-amber-300" data-testid={`price-verification-${p.id}`}>{p.verification_status === "verified" ? "Revisado" : "Pendiente de verificación"}</span>
                       <StaleWarning lastUpdated={p.last_updated} />
                     </div>
                   </TableCell>
@@ -92,7 +93,7 @@ export default function Precios() {
       )}
 
       <p className="mt-4 text-xs text-muted-foreground">
-        ⚠️ DATOS DE DEMOSTRACIÓN. Los precios definitivos deben confirmarse con la tarifa oficial vigente antes de
+        Los precios registrados deben contrastarse con la tarifa oficial vigente antes de
         presentarlos al cliente.
       </p>
     </div>

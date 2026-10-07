@@ -51,5 +51,5 @@ async def stats(_: dict = Depends(get_current_user)):
         sales=await db.sales.count_documents({}),
         users=await db.users.count_documents({}),
         last_sync=last_sync,
-        demo=True,
+        demo=False,
     )

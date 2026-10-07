@@ -16,4 +16,4 @@ class StatsOut(BaseModel):
     sales: int
     users: int
     last_sync: dict[str, str] = {}  # colección → ISO datetime
-    demo: bool = True  # DATOS DE DEMOSTRACIÓN
+    demo: bool = False

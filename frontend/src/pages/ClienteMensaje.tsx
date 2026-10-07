@@ -98,7 +98,7 @@ export default function ClienteMensaje() {
     <div data-testid="cliente-page">
       <PageHeader
         title="✉️ Respuesta para cliente"
-        subtitle="SecretarIA redacta en modo cliente: solo datos confirmados, sin información interna. Puedes copiarlo o enviarlo por email."
+        subtitle="Plantilla local con datos confirmados, sin IA generativa ni consumo de créditos. Revisa el resultado antes de copiarlo."
         right={<DemoPill />}
       />
 
@@ -129,7 +129,7 @@ export default function ClienteMensaje() {
               </div>
               <div className="space-y-1.5">
                 <Label className="text-xs">Tono</Label>
-                <Select value={tone} onValueChange={setTone}>
+                <Select value={tone} onValueChange={setTone} disabled>
                   <SelectTrigger data-testid="client-tone-select">
                     <SelectValue>{(v) => TONES.find((t) => t.value === v)?.label ?? String(v)}</SelectValue>
                   </SelectTrigger>
@@ -141,6 +141,7 @@ export default function ClienteMensaje() {
                 </Select>
               </div>
             </div>
+            <p className="text-xs text-slate-400" data-testid="client-local-template-note">Modo local: plantilla profesional fija. La redacción libre por tono requiere un servicio generativo, desactivado para evitar costes.</p>
 
             <div className="space-y-1.5">
               <Label className="text-xs">Nombre del cliente</Label>
@@ -175,14 +176,14 @@ export default function ClienteMensaje() {
             </div>
 
             <Button type="submit" className="glow-accent w-full gap-2" disabled={busy} data-testid="client-generate-button">
-              <Sparkles className="h-4 w-4" /> {busy ? "Redactando…" : "Generar mensaje"}
+              <Sparkles className="h-4 w-4" /> {busy ? "Consultando…" : "Preparar plantilla local"}
             </Button>
           </div>
         </form>
 
         <div className="glass-panel rounded-2xl p-5" data-testid="client-message-result">
           <div className="mb-4 flex items-center justify-between gap-3">
-            <h2 className="text-base font-semibold text-white">Mensaje generado</h2>
+            <h2 className="text-base font-semibold text-white">Plantilla preparada</h2>
             {content && (
               <div className="flex gap-2">
                 <Button
@@ -218,7 +219,7 @@ export default function ClienteMensaje() {
                 <span className="typing-dot h-1.5 w-1.5 rounded-full bg-sky-400" />
                 <span className="typing-dot h-1.5 w-1.5 rounded-full bg-sky-400" />
               </span>
-              SecretarIA está redactando…
+              Consultando datos confirmados…
             </div>
           ) : content ? (
             <>
@@ -232,7 +233,7 @@ export default function ClienteMensaje() {
             </>
           ) : (
             <p className="text-sm text-muted-foreground">
-              Completa los datos y pulsa «Generar mensaje». SecretarIA usará solo precios, promociones y financiación
+              Completa los datos y pulsa «Preparar plantilla local». SecretarIA usará solo precios, promociones y financiación
               confirmados; si falta algún dato escribirá [DATO PENDIENTE DE CONFIRMACIÓN].
             </p>
           )}

@@ -233,7 +233,7 @@ def build_offer_pdf(
             "Services y deben verificarse antes de su aceptación definitiva. Precios con impuestos y transporte según "
             "tarifa oficial, sin incluir gastos de matriculación salvo indicación expresa. Oferta válida salvo error "
             "tipográfico o fin de existencias de la unidad indicada.<br/><br/>"
-            f"<b>Fuente de los datos:</b> {src}. <b>DATOS DE DEMOSTRACIÓN</b> — sustituir por tarifa oficial antes de "
+            f"<b>Fuente de los datos:</b> {src}. <b>VERIFICACIÓN COMERCIAL REQUERIDA</b> — contrastar con tarifa oficial antes de "
             "entregar al cliente. Documento generado por SecretarIA para Centrowagen Don Benito.",
             small,
         )

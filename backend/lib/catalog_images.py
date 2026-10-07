@@ -4,7 +4,7 @@ Son fotografías genéricas de apoyo: el administrador puede sustituirlas por la
 imagen oficial de la tarifa pegando su URL en la ficha del vehículo.
 """
 
-FALLBACK = "https://images.unsplash.com/photo-1749417483023-c465991a548e?crop=entropy&cs=srgb&fm=jpg&q=85&w=1200"
+FALLBACK = None
 
 MODEL_IMAGES: dict[str, str] = {
     "Golf": "https://images.unsplash.com/photo-1572811298797-9eecadf6cb24?crop=entropy&cs=srgb&fm=jpg&q=85&w=1200",
@@ -22,7 +22,10 @@ MODEL_IMAGES: dict[str, str] = {
 }
 
 
-def image_for(model: str | None) -> str:
+MODEL_IMAGES = {}  # No stock photos: official media belongs to /catalog/official with provenance.
+
+
+def image_for(model: str | None) -> str | None:
     """Mejor foto disponible para un modelo (coincidencia exacta o por prefijo)."""
     name = (model or "").strip()
     if not name:

@@ -56,6 +56,10 @@ INDEXES: dict[str, list[IndexModel]] = {
     ],
     "cron_runs": [IndexModel([("run_id", ASCENDING)], name="run_id", unique=True)],
     "settings": [IndexModel([("key", ASCENDING)], name="key", unique=True)],
+    "catalog_snapshots": [IndexModel([('key', ASCENDING)], name='key', unique=True)],
+    "import_batches": [IndexModel([('id', ASCENDING)], name='id', unique=True), IndexModel([('expires_at', ASCENDING)], name='expiry', expireAfterSeconds=0)],
+    "import_audit": [IndexModel([('created_at', DESCENDING)], name='created_at')],
+    "role_changes": [IndexModel([('user_id', ASCENDING), ('created_at', DESCENDING)], name='user_created')],
 }
 
 

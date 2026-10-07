@@ -56,6 +56,7 @@ export default function VehiculoDetalle() {
       ) : !v ? null : (
         <>
           {/* Hero */}
+          {v.verification_status !== "verified" && <p className="mb-4 rounded-xl border border-amber-800/60 bg-amber-950/20 p-4 text-sm text-amber-200" data-testid="vehicle-pending-verification">Datos del concesionario pendientes de verificación comercial. No presentar como oferta confirmada.</p>}
           <section className="glass-panel overflow-hidden rounded-3xl" data-testid="vehicle-hero">
             <div className="grid lg:grid-cols-[1.25fr_1fr]">
               <div className="relative aspect-[16/10] bg-slate-900 lg:aspect-auto lg:min-h-[320px]">

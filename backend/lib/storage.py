@@ -83,12 +83,25 @@ def _get(path: str) -> tuple[bytes, str]:
 
 # requests is sync — keep the event loop free.
 async def put_object(path: str, data: bytes, content_type: str) -> dict:
+    if not EMERGENT_KEY:
+        from motor.motor_asyncio import AsyncIOMotorGridFSBucket
+        from lib.db import db
+        oid = await AsyncIOMotorGridFSBucket(db).upload_from_stream(path, data, metadata={'content_type': content_type})
+        return {'path': f'gridfs:{oid}'}
     return await asyncio.to_thread(_put, path, data, content_type)
 
 
 async def get_object(path: str) -> tuple[bytes, str]:
+    if path.startswith('gridfs:'):
+        from bson import ObjectId
+        from motor.motor_asyncio import AsyncIOMotorGridFSBucket
+        from lib.db import db
+        stream = await AsyncIOMotorGridFSBucket(db).open_download_stream(ObjectId(path.split(':', 1)[1]))
+        return await stream.read(), (stream.metadata or {}).get('content_type', 'application/octet-stream')
     return await asyncio.to_thread(_get, path)
 
 
 async def init_storage_async(force: bool = False) -> str:
+    if not EMERGENT_KEY:
+        return 'gridfs'
     return await asyncio.to_thread(init_storage, force)
